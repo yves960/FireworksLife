@@ -1,0 +1,149 @@
+---
+import Base from '../layouts/Base.astro';
+---
+
+<Base title="关于 · FireworksLife">
+  <article class="about">
+    <header class="about-header">
+      <h1>关于 FireworksLife</h1>
+      <p class="tagline">记录生活，发现美好</p>
+    </header>
+
+    <section class="about-content">
+      <div class="intro">
+        <p>
+          FireworksLife 是一个用 <strong>Astro</strong> 构建的个人博客。
+          追求的是超快的加载速度、炫酷的视觉效果，以及纯粹的阅读体验。
+        </p>
+      </div>
+
+      <div class="tech-stack">
+        <h2>技术栈</h2>
+        <ul>
+          <li><strong>Astro</strong> — 静态站点生成器，默认零 JS</li>
+          <li><strong>Netlify</strong> — 全球 CDN 部署</li>
+          <li><strong>GitHub</strong> — 代码托管与自动部署</li>
+          <li><strong>Markdown</strong> — 纯文本写作，无负担</li>
+        </ul>
+      </div>
+
+      <div class="philosophy">
+        <h2>理念</h2>
+        <blockquote>
+          生活就像烟火，短暂而璀璨。每一个想法、每一次发现、每一段经历，都值得被记录。
+        </blockquote>
+        <p>
+          这个博客会记录技术心得、生活感悟、项目分享。不追求完美，只追求真实。
+        </p>
+      </div>
+
+      <div class="contact">
+        <h2>联系方式</h2>
+        <p>如果你有任何想法或建议，欢迎通过以下方式交流：</p>
+        <ul>
+          <li>GitHub: <a href="https://github.com/yves960" target="_blank">@yves960</a></li>
+        </ul>
+      </div>
+    </section>
+  </article>
+</Base>
+
+<style>
+  .about {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 2rem 0;
+  }
+
+  .about-header {
+    text-align: center;
+    margin-bottom: 4rem;
+    animation: fade-in 0.6s ease-out;
+  }
+
+  .about-header h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    font-weight: 700;
+    background: linear-gradient(135deg, #8b5cf6, #c084fc);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+  }
+
+  .tagline {
+    color: var(--text-secondary);
+    font-size: 1.1rem;
+  }
+
+  .about-content {
+    animation: content-appear 0.8s ease-out 0.2s backwards;
+  }
+
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes content-appear {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .intro {
+    font-size: 1.1rem;
+    line-height: 1.8;
+    color: var(--text-primary);
+    margin-bottom: 3rem;
+  }
+
+  .tech-stack, .philosophy, .contact {
+    margin-bottom: 3rem;
+  }
+
+  h2 {
+    font-size: 1.35rem;
+    color: #c4b5fd;
+    margin-bottom: 1rem;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+  }
+
+  ul li {
+    padding: 0.5rem 0;
+    color: var(--text-secondary);
+    border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+  }
+
+  ul li:last-child {
+    border-bottom: none;
+  }
+
+  ul li strong {
+    color: var(--text-primary);
+  }
+
+  blockquote {
+    border-left: 3px solid #8b5cf6;
+    padding-left: 1.5rem;
+    margin: 1.5rem 0;
+    font-size: 1.15rem;
+    color: #c4b5fd;
+    font-style: italic;
+  }
+
+  .contact a {
+    color: #8b5cf6;
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  .contact a:hover {
+    color: #a78bfa;
+  }
+</style>
