@@ -1,10 +1,14 @@
 ---
+
 title: "Agent和Harness：我为什么说这不是两个概念，而是一套世界观"
 description: "Agent和Harness：我为什么说这不是两个概念，而是一套世界观"
 pubDate: 2026-03-30
 category: "技术"
-tags: ["AI", "开发"]
+subTag: "理论"
+tags: ["AI", "Agent", "Harness"]
+
 ---
+
 
 ## 从一个困惑开始
 

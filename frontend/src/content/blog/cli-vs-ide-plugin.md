@@ -1,10 +1,14 @@
 ---
+
 title: "第一章：CLI vs IDE Plugin —— AI Agent 时代的基础设施升级"
 description: "第一章：CLI vs IDE Plugin —— AI Agent 时代的基础设施升级"
 pubDate: 2026-03-31
 category: "技术"
-tags: ["AI", "开发"]
+subTag: "基础概念"
+tags: ["CLI", "AI", "基础设施"]
+
 ---
+
 
 > 来源：沉默王二，《面试官："为什么一夜之间大家都在做 CLI？"》
 > 原文链接：https://mp.weixin.qq.com/s/Jk9n5aRRY6Ms58d0t_oOWQ

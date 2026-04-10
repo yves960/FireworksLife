@@ -1,10 +1,14 @@
 ---
+
 title: "Claude Code的代码检索之争：一场关于精准的误会"
 description: "Claude Code的代码检索之争：一场关于精准的误会"
 pubDate: 2026-03-30
 category: "技术"
-tags: ["AI", "开发"]
+subTag: "工具对比"
+tags: ["Claude", "Cursor", "代码检索"]
+
 ---
+
 
 ## 一个真实的故事
 

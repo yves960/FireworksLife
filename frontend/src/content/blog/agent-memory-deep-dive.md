@@ -1,10 +1,14 @@
 ---
+
 title: "Agent Memory：一个让我重新思考记忆概念的框架"
 description: "Agent Memory：一个让我重新思考记忆概念的框架"
 pubDate: 2026-03-30
 category: "技术"
-tags: ["AI", "开发"]
+subTag: "理论"
+tags: ["AI", "Agent", "Memory"]
+
 ---
+
 
 ## 从一个问题开始
 

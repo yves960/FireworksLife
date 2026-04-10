@@ -8,6 +8,7 @@ const blog = defineCollection({
     description: z.string(),
     pubDate: z.date(),
     category: z.string().default('默认'),
+    subTag: z.string().optional(),
     tags: z.array(z.string()).optional(),
   }),
 });

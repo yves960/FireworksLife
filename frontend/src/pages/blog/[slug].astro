@@ -19,8 +19,10 @@ const { Content } = await render(post);
     <a href="/" class="back">← 返回首页</a>
     <header>
       <h1>{post.data.title}</h1>
-      <time>{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</time>
+      <time>{new Date(post.data.pubDate).toLocaleDateString('zh-CN', { year: 'numeric', month: 'long', day: 'numeric' })}</time>
       <span class="post-category">{post.data.category}</span>
+      {post.data.subTag && <span class="post-subtag">{post.data.subTag}</span>}
+      <span class="post-date">{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</span>
     </header>
     <div class="content">
       <Content />

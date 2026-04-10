@@ -5,8 +5,9 @@ import { getCollection } from 'astro:content';
 const posts = await getCollection('blog');
 const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 
-// 获取所有分类
+// Get all categories and subTags
 const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
+const allTags = [...new Set(posts.flatMap(p => p.data.tags || []))];
 ---
 
 <Base title="FireworksLife · 炫酷个人博客">
@@ -16,6 +17,11 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
   </section>
 
   <section class="posts">
+    <!-- 搜索框 -->
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="🔍 搜索文章..." />
+    </div>
+
     <!-- 分类标签 -->
     <div class="category-tabs">
       {categories.map(cat => (
@@ -23,43 +29,134 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
       ))}
     </div>
 
+    <!-- 二级标签 -->
+    <div class="subTag-tabs" id="subTagTabs">
+      <span class="subTag-label">标签：</span>
+      {allTags.slice(0, 8).map(tag => (
+        <button class="subTag-tab" data-tag={tag}>{tag}</button>
+      ))}
+    </div>
+
     <!-- 文章列表 -->
-    <div class="posts-grid">
+    <div class="posts-grid" id="postsGrid">
       {sortedPosts.map(post => (
-        <a href={`/blog/${post.id}`} class="post-card" data-category={post.data.category}>
-          <span class="post-category">{post.data.category}</span>
+        <a 
+          href={`/blog/${post.id}`} 
+          class="post-card" 
+          data-category={post.data.category}
+          data-tags={JSON.stringify(post.data.tags || [])}
+          data-title={post.data.title.toLowerCase()}
+          data-description={post.data.description.toLowerCase()}
+        >
+          <div class="card-header">
+            <span class="post-category">{post.data.category}</span>
+            {post.data.subTag && <span class="post-subtag">{post.data.subTag}</span>}
+          </div>
           <h3>{post.data.title}</h3>
           <p class="post-date">{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</p>
           <p class="post-excerpt">{post.data.description}</p>
+          <div class="post-tags">
+            {(post.data.tags || []).slice(0, 3).map(tag => (
+              <span class="tag">{tag}</span>
+            ))}
+          </div>
           <span class="read-more">阅读更多 →</span>
         </a>
       ))}
+    </div>
+
+    <!-- 无结果提示 -->
+    <div class="no-results" id="noResults" style="display: none;">
+      <p>没有找到匹配的文章</p>
     </div>
   </section>
 </Base>
 
 <script>
-  const tabs = document.querySelectorAll('.category-tab');
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement;
+  const categoryTabs = document.querySelectorAll('.category-tab');
+  const subTagTabs = document.querySelectorAll('.subTag-tab');
   const cards = document.querySelectorAll('.post-card');
+  const noResults = document.getElementById('noResults');
+  const subTagTabsContainer = document.getElementById('subTagTabs');
 
-  tabs.forEach(tab => {
-    tab.addEventListener('click', () => {
-      const category = tab.getAttribute('data-category');
+  let currentCategory = '全部';
+  let currentTag = '';
+  let searchText = '';
+
+  function filterCards() {
+    let visibleCount = 0;
+    
+    cards.forEach(card => {
+      const el = card as HTMLElement;
+      const category = el.getAttribute('data-category') || '';
+      const tags = JSON.parse(el.getAttribute('data-tags') || '[]');
+      const title = el.getAttribute('data-title') || '';
+      const description = el.getAttribute('data-description') || '';
       
-      // 更新标签状态
-      tabs.forEach(t => t.classList.remove('active'));
+      const matchCategory = currentCategory === '全部' || category === currentCategory;
+      const matchTag = !currentTag || tags.includes(currentTag);
+      const matchSearch = !searchText || 
+        title.includes(searchText) || 
+        description.includes(searchText);
+      
+      if (matchCategory && matchTag && matchSearch) {
+        el.style.display = 'block';
+        visibleCount++;
+      } else {
+        el.style.display = 'none';
+      }
+    });
+    
+    if (noResults) {
+      noResults.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+    
+    // Show/hide subTag tabs based on category
+    if (subTagTabsContainer) {
+      subTagTabsContainer.style.opacity = currentCategory === '全部' ? '1' : '0.5';
+    }
+  }
+
+  // 分类切换
+  categoryTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentCategory = tab.getAttribute('data-category') || '全部';
+      currentTag = ''; // 重置标签
+      
+      categoryTabs.forEach(t => t.classList.remove('active'));
       tab.classList.add('active');
       
-      // 筛选文章
-      cards.forEach(card => {
-        const cardCategory = card.getAttribute('data-category');
-        if (category === '全部' || cardCategory === category) {
-          card.style.display = 'block';
-        } else {
-          card.style.display = 'none';
-        }
-      });
+      // 清除标签选中
+      subTagTabs.forEach(t => t.classList.remove('active'));
+      
+      filterCards();
     });
+  });
+
+  // 标签切换
+  subTagTabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const tag = tab.getAttribute('data-tag') || '';
+      
+      if (currentTag === tag) {
+        currentTag = '';
+        subTagTabs.forEach(t => t.classList.remove('active'));
+      } else {
+        currentTag = tag;
+        subTagTabs.forEach(t => {
+          t.classList.toggle('active', t.getAttribute('data-tag') === tag);
+        });
+      }
+      
+      filterCards();
+    });
+  });
+
+  // 搜索
+  searchInput?.addEventListener('input', (e) => {
+    searchText = (e.target as HTMLInputElement).value.toLowerCase();
+    filterCards();
   });
 </script>
 
@@ -98,10 +195,39 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
     to { opacity: 1; transform: translateY(0); }
   }
 
+  /* 搜索框 */
+  .search-box {
+    margin-bottom: 1.5rem;
+  }
+
+  .search-box input {
+    width: 100%;
+    max-width: 400px;
+    padding: 0.875rem 1.25rem;
+    background: var(--bg-card);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    border-radius: 12px;
+    color: var(--text-primary);
+    font-size: 1rem;
+    font-family: inherit;
+    transition: all 0.3s;
+  }
+
+  .search-box input:focus {
+    outline: none;
+    border-color: var(--accent);
+    box-shadow: 0 0 20px rgba(139, 92, 246, 0.2);
+  }
+
+  .search-box input::placeholder {
+    color: var(--text-secondary);
+  }
+
+  /* 分类标签 */
   .category-tabs {
     display: flex;
     gap: 0.75rem;
-    margin-bottom: 2rem;
+    margin-bottom: 1rem;
     flex-wrap: wrap;
   }
 
@@ -126,6 +252,44 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
     background: var(--accent);
     border-color: var(--accent);
     color: white;
+  }
+
+  /* 二级标签 */
+  .subTag-tabs {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+    align-items: center;
+    transition: opacity 0.3s;
+  }
+
+  .subTag-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+  }
+
+  .subTag-tab {
+    background: transparent;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+    color: var(--text-secondary);
+    padding: 0.25rem 0.75rem;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 0.8rem;
+    font-family: inherit;
+    transition: all 0.2s;
+  }
+
+  .subTag-tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .subTag-tab.active {
+    background: rgba(139, 92, 246, 0.2);
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
   .posts-grid {
@@ -161,6 +325,12 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
     border-color: var(--accent);
   }
 
+  .card-header {
+    display: flex;
+    gap: 0.5rem;
+    margin-bottom: 0.75rem;
+  }
+
   .post-category {
     display: inline-block;
     background: rgba(139, 92, 246, 0.2);
@@ -168,17 +338,26 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
     padding: 0.2rem 0.6rem;
     border-radius: 4px;
     font-size: 0.75rem;
-    margin-bottom: 0.75rem;
+  }
+
+  .post-subtag {
+    display: inline-block;
+    background: rgba(236, 72, 153, 0.2);
+    color: #ec4899;
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
   }
 
   .post-card h3 {
-    font-size: 1.2rem;
+    font-size: 1.15rem;
     margin-bottom: 0.5rem;
     color: var(--text-primary);
+    line-height: 1.4;
   }
 
   .post-date {
-    font-size: 0.85rem;
+    font-size: 0.8rem;
     color: var(--text-secondary);
     margin-bottom: 0.75rem;
   }
@@ -188,11 +367,36 @@ const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
     color: var(--text-secondary);
     line-height: 1.6;
     margin-bottom: 1rem;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .post-tags {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+    margin-bottom: 1rem;
+  }
+
+  .tag {
+    background: rgba(139, 92, 246, 0.1);
+    color: var(--text-secondary);
+    padding: 0.15rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.7rem;
   }
 
   .read-more {
     font-size: 0.85rem;
     color: var(--accent);
     font-weight: 500;
+  }
+
+  .no-results {
+    text-align: center;
+    padding: 4rem 2rem;
+    color: var(--text-secondary);
   }
 </style>

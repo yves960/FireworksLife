@@ -1,10 +1,14 @@
 ---
+
 title: "SDD：我发现AI写代码最大的问题不是能力，是约束"
 description: "SDD：我发现AI写代码最大的问题不是能力，是约束"
 pubDate: 2026-03-30
 category: "技术"
-tags: ["AI", "开发"]
+subTag: "方法论"
+tags: ["AI", "SDD", "开发流程"]
+
 ---
+
 
 ## 一个我见过的场景
 

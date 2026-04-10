@@ -1,10 +1,14 @@
 ---
+
 title: "Beads和OpenSpec：为什么AI代理需要两套系统"
 description: "Beads和OpenSpec：为什么AI代理需要两套系统"
 pubDate: 2026-03-30
 category: "技术"
-tags: ["AI", "开发"]
+subTag: "实践"
+tags: ["AI", "Agent", "工作流"]
+
 ---
+
 
 ## 一个我观察到的痛点
 
