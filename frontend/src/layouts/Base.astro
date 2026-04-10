@@ -33,10 +33,7 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
     <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 
     <div class="pet-sprite" id="petSprite" aria-hidden="true" data-mood="idle" data-state="active">
-      <span class="pet-aura"></span>
-      <span class="pet-trail"></span>
       <span class="pet-core">
-        <span class="pet-halo"></span>
         <span class="pet-belly"></span>
         <span class="pet-fin pet-fin-top"></span>
         <span class="pet-fin pet-fin-bottom"></span>
@@ -53,9 +50,6 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
           <span class="pet-mouth pet-mouth-excited"></span>
         </span>
       </span>
-      <span class="pet-spark spark-a"></span>
-      <span class="pet-spark spark-b"></span>
-      <span class="pet-spark spark-c"></span>
       <span class="pet-bubble" id="petBubble">Hi</span>
     </div>
 
@@ -220,10 +214,7 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         z-index: 12;
       }
 
-      .pet-aura,
-      .pet-trail,
       .pet-core,
-      .pet-halo,
       .pet-belly,
       .pet-fin,
       .pet-tail,
@@ -234,70 +225,21 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         inset: 0;
       }
 
-      .pet-aura {
-        inset: -0.35rem;
-        border-radius: 999px;
-        background: radial-gradient(circle, rgba(94, 234, 212, 0.18), rgba(255, 122, 24, 0.08) 44%, transparent 72%);
-        filter: blur(20px);
-        animation: aura-shift 3.8s ease-in-out infinite;
-      }
-
-      .pet-trail {
-        inset: 1.2rem auto 1.2rem -0.45rem;
-        width: 3.7rem;
-        border-radius: 999px;
-        background: linear-gradient(90deg, rgba(94, 234, 212, 0.18), rgba(123, 211, 255, 0.18), rgba(255, 193, 120, 0.14), transparent);
-        filter: blur(18px);
-        animation: pulse-trail 2.2s ease-in-out infinite;
-      }
-
       .pet-core {
-        inset: 1.05rem 0.55rem 1.15rem 0.7rem;
-        border-radius: 54% 46% 46% 54% / 58% 58% 42% 42%;
+        inset: 1.15rem 0.55rem 1.2rem 0.52rem;
+        border-radius: 58% 42% 45% 55% / 56% 56% 44% 44%;
         background:
-          radial-gradient(circle at 72% 28%, rgba(255, 255, 255, 0.98), rgba(255, 255, 255, 0.32) 14%, transparent 16%),
-          radial-gradient(circle at 42% 78%, rgba(255, 255, 255, 0.14), transparent 26%),
-          linear-gradient(135deg, rgba(98, 244, 220, 0.96), rgba(92, 191, 255, 0.94) 38%, rgba(255, 182, 96, 0.92) 72%, rgba(255, 132, 178, 0.82));
-        box-shadow:
-          0 0 24px rgba(80, 170, 255, 0.24),
-          0 0 52px rgba(94, 234, 212, 0.16);
+          radial-gradient(circle at 74% 30%, rgba(255, 255, 255, 0.6), transparent 12%),
+          linear-gradient(135deg, #7ad9ca, #67b8e6 38%, #f2ad72 72%, #f39a84 100%);
+        border: 1px solid rgba(255, 255, 255, 0.2);
         animation: pet-bob 2.4s ease-in-out infinite;
       }
 
-      .pet-halo {
-        inset: -0.15rem -0.1rem;
-        border: 1px solid rgba(255, 255, 255, 0.16);
-        border-radius: 54% 46% 46% 54% / 58% 58% 42% 42%;
-        animation: spin 10s linear infinite;
-      }
-
-      .pet-halo::before,
-      .pet-halo::after {
-        content: "";
-        position: absolute;
-        width: 0.7rem;
-        height: 0.7rem;
-        border-radius: 999px;
-        background: rgba(255, 244, 223, 0.92);
-        box-shadow: 0 0 12px rgba(255, 255, 255, 0.4);
-      }
-
-      .pet-halo::before {
-        top: -0.05rem;
-        left: 22%;
-        transform: translateX(-50%);
-      }
-
-      .pet-halo::after {
-        bottom: -0.02rem;
-        right: 18%;
-      }
-
       .pet-belly {
-        inset: 1.3rem 0.95rem 1.05rem 1.55rem;
-        border-radius: 55% 45% 52% 48% / 60% 60% 40% 40%;
-        background: linear-gradient(180deg, rgba(255, 248, 234, 0.36), rgba(255, 248, 234, 0.08));
-        opacity: 0.78;
+        inset: 1.58rem 1.02rem 1.18rem 1.4rem;
+        border-radius: 60% 40% 46% 54% / 58% 58% 42% 42%;
+        background: linear-gradient(180deg, rgba(255, 244, 228, 0.72), rgba(255, 244, 228, 0.2));
+        opacity: 0.92;
       }
 
       .pet-fin {
@@ -307,65 +249,65 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
       .pet-fin-top::before {
         content: "";
         position: absolute;
-        top: 0.35rem;
-        left: 2rem;
-        width: 0.95rem;
-        height: 0.95rem;
-        background: linear-gradient(180deg, rgba(255, 244, 223, 0.82), rgba(94, 234, 212, 0.34));
-        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-        border-radius: 999px 999px 0 0;
+        top: 0.58rem;
+        left: 1.9rem;
+        width: 0.82rem;
+        height: 0.78rem;
+        background: rgba(255, 239, 216, 0.92);
+        clip-path: polygon(52% 0%, 0% 100%, 100% 100%);
         animation: fin-sway 1.2s ease-in-out infinite;
       }
 
       .pet-fin-bottom::before {
         content: "";
         position: absolute;
-        left: 2rem;
-        top: 2.82rem;
-        width: 0.82rem;
-        height: 0.7rem;
-        background: linear-gradient(180deg, rgba(255, 244, 223, 0.72), rgba(255, 140, 96, 0.28));
-        clip-path: polygon(15% 0%, 100% 10%, 62% 100%);
-        border-radius: 0 0 999px 999px;
-        transform: rotate(12deg);
-        opacity: 0.88;
+        left: 1.94rem;
+        top: 2.86rem;
+        width: 0.76rem;
+        height: 0.58rem;
+        background: rgba(255, 229, 198, 0.8);
+        clip-path: polygon(10% 0%, 100% 8%, 58% 100%);
+        transform: rotate(10deg);
+        opacity: 0.92;
       }
 
       .pet-fin-side::before {
         content: "";
         position: absolute;
-        left: 1.9rem;
-        top: 2rem;
-        width: 0.98rem;
-        height: 0.76rem;
-        background: linear-gradient(135deg, rgba(255, 244, 223, 0.84), rgba(255, 140, 96, 0.42));
+        left: 1.72rem;
+        top: 2.08rem;
+        width: 0.88rem;
+        height: 0.68rem;
+        background: rgba(255, 231, 205, 0.82);
         clip-path: ellipse(50% 44% at 50% 50%);
         border-radius: 999px;
-        opacity: 0.92;
-        transform: rotate(20deg);
+        opacity: 0.95;
+        transform: rotate(18deg);
       }
 
       .pet-tail::before,
       .pet-tail::after {
         content: "";
         position: absolute;
-        left: -0.42rem;
-        top: 1.48rem;
-        width: 1.38rem;
-        height: 1.12rem;
-        background: linear-gradient(135deg, rgba(255, 244, 223, 0.88), rgba(94, 234, 212, 0.36));
-        clip-path: polygon(100% 50%, 10% 0%, 0% 50%, 10% 100%);
-        border-radius: 0.2rem;
+        left: -0.54rem;
+        top: 1.44rem;
+        width: 1.52rem;
+        height: 1.2rem;
+        background: linear-gradient(135deg, #80d7d3, #5fb5dd 64%, #f1b27d);
+        clip-path: polygon(100% 50%, 18% 0%, 0% 50%, 18% 100%);
         transform-origin: right center;
         animation: tail-flick 1.1s ease-in-out infinite;
       }
 
       .pet-tail::after {
-        top: 1.84rem;
-        left: 0.24rem;
-        width: 0.42rem;
-        height: 0.38rem;
-        opacity: 0.5;
+        top: 1.86rem;
+        left: 0.16rem;
+        width: 0.56rem;
+        height: 0.18rem;
+        background: rgba(83, 122, 157, 0.28);
+        clip-path: none;
+        border-radius: 999px;
+        opacity: 0.8;
         animation-duration: 1.4s;
       }
 
@@ -373,10 +315,10 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
       .pet-gill::after {
         content: "";
         position: absolute;
-        top: 1.85rem;
-        right: 1.25rem;
-        width: 0.42rem;
-        height: 0.72rem;
+        top: 1.96rem;
+        right: 1.3rem;
+        width: 0.36rem;
+        height: 0.62rem;
         border-left: 2px solid rgba(8, 17, 31, 0.34);
         border-radius: 999px;
         transform: rotate(10deg);
@@ -389,7 +331,7 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
 
       .pet-scale {
         border-radius: 999px;
-        background: radial-gradient(circle, rgba(255, 244, 223, 0.28), transparent 72%);
+        background: radial-gradient(circle, rgba(255, 244, 223, 0.2), transparent 72%);
         pointer-events: none;
       }
 
@@ -411,13 +353,12 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
       }
 
       .pet-eye {
-        width: 0.7rem;
-        height: 0.7rem;
+        width: 0.62rem;
+        height: 0.62rem;
         background: #08111f;
         border-radius: 999px;
         box-shadow:
-          inset -0.08rem -0.08rem 0 0 rgba(255, 255, 255, 0.26),
-          0 0 0 0.08rem rgba(255, 255, 255, 0.16);
+          inset -0.06rem -0.06rem 0 0 rgba(255, 255, 255, 0.18);
         animation: blink 4.8s ease-in-out infinite;
         transition:
           transform 0.2s ease,
@@ -426,9 +367,9 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
 
       .pet-eye-glint {
         position: absolute;
-        inset: 1.62rem auto auto 2.58rem;
-        width: 0.18rem;
-        height: 0.18rem;
+        inset: 1.7rem auto auto 2.64rem;
+        width: 0.14rem;
+        height: 0.14rem;
         background: rgba(255, 255, 255, 0.95);
         box-shadow: none;
         animation: none;
@@ -449,10 +390,10 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
 
       .pet-mouth {
         position: absolute;
-        left: 3.18rem;
-        top: 2.18rem;
-        width: 0.34rem;
-        height: 0.34rem;
+        left: 3.16rem;
+        top: 2.12rem;
+        width: 0.28rem;
+        height: 0.28rem;
         border-right: 2px solid #08111f;
         border-bottom: 2px solid #08111f;
         border-radius: 0 50% 70% 0;
@@ -465,45 +406,14 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
       }
 
       .pet-mouth-excited {
-        left: 3.05rem;
-        top: 2.04rem;
-        width: 0.34rem;
-        height: 0.34rem;
+        left: 3.02rem;
+        top: 2rem;
+        width: 0.28rem;
+        height: 0.28rem;
         border: 2px solid #08111f;
         border-radius: 999px;
         background: rgba(255, 244, 223, 0.28);
         opacity: 0;
-      }
-
-      .pet-spark {
-        position: absolute;
-        width: 0.36rem;
-        height: 0.36rem;
-        border-radius: 999px;
-        background: rgba(255, 244, 223, 0.95);
-        box-shadow: 0 0 12px rgba(255, 255, 255, 0.36);
-      }
-
-      .spark-a {
-        top: 0.35rem;
-        right: 0.4rem;
-        animation: spark-float 1.9s ease-in-out infinite;
-      }
-
-      .spark-b {
-        bottom: 0.7rem;
-        left: 0.25rem;
-        width: 0.28rem;
-        height: 0.28rem;
-        animation: spark-float 2.3s ease-in-out infinite reverse;
-      }
-
-      .spark-c {
-        top: 1.1rem;
-        left: -0.15rem;
-        width: 0.24rem;
-        height: 0.24rem;
-        animation: spark-float 2.1s ease-in-out infinite;
       }
 
       .pet-bubble {
@@ -546,14 +456,6 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         transform: scale(1.08);
       }
 
-      .pet-sprite[data-mood="excited"] .pet-aura {
-        opacity: 1;
-      }
-
-      .pet-sprite[data-mood="excited"] .pet-spark {
-        background: rgba(94, 234, 212, 0.95);
-      }
-
       .pet-sprite[data-mood="excited"] .pet-eye {
         transform: scale(1.1);
       }
@@ -585,23 +487,6 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         left: 3.16rem;
         top: 2.24rem;
         opacity: 0.72;
-      }
-
-      .pet-sprite[data-state="docked"] .pet-aura {
-        opacity: 0.45;
-        transform: scale(0.82);
-      }
-
-      .pet-sprite[data-state="docked"] .pet-fin-top::before {
-        animation-duration: 2s;
-      }
-
-      .pet-sprite[data-state="docked"] .pet-tail {
-        opacity: 0.82;
-      }
-
-      .pet-sprite[data-state="docked"] .pet-core {
-        animation-duration: 3.2s;
       }
 
       .site-nav {
@@ -739,30 +624,6 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         }
       }
 
-      @keyframes pulse-trail {
-        0%,
-        100% {
-          transform: scale(0.92);
-          opacity: 0.75;
-        }
-        50% {
-          transform: scale(1.12);
-          opacity: 1;
-        }
-      }
-
-      @keyframes aura-shift {
-        0%,
-        100% {
-          transform: scale(0.92);
-          opacity: 0.62;
-        }
-        50% {
-          transform: scale(1.06);
-          opacity: 1;
-        }
-      }
-
       @keyframes pet-bob {
         0%,
         100% {
@@ -802,27 +663,6 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         }
         49% {
           transform: scaleY(0.2);
-        }
-      }
-
-      @keyframes spark-float {
-        0%,
-        100% {
-          transform: translateY(0) scale(0.85);
-          opacity: 0.5;
-        }
-        50% {
-          transform: translateY(-0.45rem) scale(1.1);
-          opacity: 1;
-        }
-      }
-
-      @keyframes spin {
-        from {
-          transform: rotate(0deg);
-        }
-        to {
-          transform: rotate(360deg);
         }
       }
 
@@ -893,43 +733,26 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         let targetPetX = mouseX;
         let targetPetY = mouseY;
         let moodTimer;
-        let lastMoveAt = Date.now();
-        let isDocked = false;
         let lastMouseClientX = mouseX;
         let lastMouseClientY = mouseY;
-
-        const dockOffsetX = 120;
-        const dockOffsetY = 116;
 
         const petMessages = {
           idle: ['小鱼', '冒泡', '在线', '游来啦'],
           hover: ['戳这里', '看这个', '游过去', '有东西'],
           excited: ['咕噜!', '亮了', '冲呀', '开摆尾'],
-          sleepy: ['停靠中', 'zzZ', '漂一会', '休息']
+          sleepy: ['安静', '漂着', '跟上了', '看着你']
         };
 
-        function getDockPoint() {
-          return {
-            x: window.innerWidth - dockOffsetX,
-            y: window.innerHeight - dockOffsetY
-          };
+        const petOffsetX = -58;
+        const petOffsetY = 30;
+
+        function clamp(value, min, max) {
+          return Math.min(Math.max(value, min), max);
         }
 
-        function setDocked(nextDocked, message) {
-          if (!petSprite) return;
-          isDocked = nextDocked;
-          petSprite.dataset.state = nextDocked ? 'docked' : 'active';
-
-          if (nextDocked) {
-            const dock = getDockPoint();
-            targetPetX = dock.x;
-            targetPetY = dock.y;
-            setPetMood('sleepy', message || '回窝');
-          } else {
-            targetPetX = mouseX;
-            targetPetY = mouseY;
-            setPetMood('idle', message || '起飞');
-          }
+        function updatePetTarget() {
+          targetPetX = clamp(mouseX + petOffsetX, 42, window.innerWidth - 42);
+          targetPetY = clamp(mouseY + petOffsetY, 42, window.innerHeight - 42);
         }
 
         function setPetMood(mood, forceMessage) {
@@ -963,20 +786,9 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         document.addEventListener('mousemove', (event) => {
           mouseX = event.clientX;
           mouseY = event.clientY;
-          lastMoveAt = Date.now();
           lastMouseClientX = event.clientX;
           lastMouseClientY = event.clientY;
-
-          const dock = getDockPoint();
-          const nearDock = Math.hypot(event.clientX - dock.x, event.clientY - dock.y) < 180;
-
-          if (isDocked && nearDock) {
-            setDocked(false, '醒了');
-          }
-
-          if (!isDocked && petSprite?.dataset.mood === 'sleepy') {
-            setPetMood('idle', '游回来');
-          }
+          updatePetTarget();
         });
 
         interactiveTargets.forEach((target) => {
@@ -990,11 +802,7 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         });
 
         window.addEventListener('resize', () => {
-          if (isDocked) {
-            const dock = getDockPoint();
-            targetPetX = dock.x;
-            targetPetY = dock.y;
-          }
+          updatePetTarget();
         });
 
         spotlightCards.forEach((card) => {
@@ -1017,16 +825,8 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
         function animate() {
           glowX += (mouseX - glowX) * 0.12;
           glowY += (mouseY - glowY) * 0.12;
-          if (!isDocked) {
-            targetPetX = mouseX;
-            targetPetY = mouseY;
-          }
-          petX += (targetPetX - petX) * (isDocked ? 0.045 : 0.08);
-          petY += (targetPetY - petY) * (isDocked ? 0.045 : 0.08);
-
-          if (Date.now() - lastMoveAt > 2600 && !isDocked) {
-            setDocked(true, '回窝');
-          }
+          petX += (targetPetX - petX) * 0.11;
+          petY += (targetPetY - petY) * 0.11;
 
           if (cursorGlow) {
             cursorGlow.style.transform = `translate(${glowX - 144}px, ${glowY - 144}px)`;
@@ -1034,13 +834,15 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
 
           if (petSprite) {
             petSprite.style.transform = `translate(${petX - 38}px, ${petY - 38}px)`;
-            const aimX = (isDocked ? lastMouseClientX : mouseX) - petX;
-            petSprite.style.rotate = `${aimX * 0.03}deg`;
+            const aimX = lastMouseClientX - petX;
+            const aimY = lastMouseClientY - petY;
+            petSprite.style.rotate = `${clamp((aimX * 0.03) + (aimY * 0.012), -14, 14)}deg`;
           }
 
           requestAnimationFrame(animate);
         }
 
+        updatePetTarget();
         animate();
       } else {
         document.querySelectorAll('.reveal').forEach((item) => item.classList.add('is-visible'));
