@@ -160,6 +160,52 @@ const postTitle = post.data.title;
     commentStatus.classList.toggle('is-error', isError);
   };
 
+  const applyEngagementState = (data: {
+    liked?: boolean;
+    likesCount?: number;
+    favorited?: boolean;
+    comments?: Array<{
+      id: string;
+      author: string;
+      content: string;
+      createdAt: string;
+      clientId?: string;
+      replies?: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string }>;
+    }>;
+    moderationMode?: string;
+  }) => {
+    if (likeCount && typeof data.likesCount === 'number') {
+      likeCount.textContent = String(data.likesCount);
+    }
+
+    if (favoriteState && typeof data.favorited === 'boolean') {
+      favoriteState.textContent = data.favorited ? '已收藏' : '未收藏';
+    }
+
+    if (typeof data.liked === 'boolean') {
+      likeButton?.classList.toggle('is-active', data.liked);
+    }
+
+    if (typeof data.favorited === 'boolean') {
+      favoriteButton?.classList.toggle('is-active', data.favorited);
+      window.dispatchEvent(new CustomEvent('yufu:favorites-updated', {
+        detail: {
+          slug: postSlug,
+          title: postTitle,
+          favorited: data.favorited,
+        },
+      }));
+    }
+
+    if (Array.isArray(data.comments)) {
+      renderComments(data.comments);
+    }
+
+    if (commentEmpty && data.moderationMode === 'manual' && !data.comments?.length) {
+      commentEmpty.textContent = '公开评论为空，新的留言会先进入待审核状态。';
+    }
+  };
+
   const renderComments = (items: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string; replies?: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string }> }>) => {
     if (!commentList || !commentEmpty) return;
     const clientId = getClientId();
@@ -246,22 +292,8 @@ const postTitle = post.data.title;
     })
       .then((response) => response.json())
       .then((data) => {
-        if (likeCount) {
-          likeCount.textContent = String(data.likesCount || 0);
-        }
-
-        if (favoriteState) {
-          favoriteState.textContent = data.favorited ? '已收藏' : '未收藏';
-        }
-
-        likeButton?.classList.toggle('is-active', Boolean(data.liked));
-        favoriteButton?.classList.toggle('is-active', Boolean(data.favorited));
-        renderComments(Array.isArray(data.comments) ? data.comments : []);
+        applyEngagementState(data);
         setStatus('');
-
-        if (commentEmpty && data.moderationMode === 'manual' && !data.comments?.length) {
-          commentEmpty.textContent = '公开评论为空，新的留言会先进入待审核状态。';
-        }
       })
       .catch(() => {
         if (commentEmpty) {
@@ -281,7 +313,17 @@ const postTitle = post.data.title;
         'x-client-id': getClientId(),
       },
       body: JSON.stringify({ slug: postSlug, action: 'like' }),
-    }).then(() => syncEngagement());
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || '点赞失败');
+        }
+        applyEngagementState(data);
+      })
+      .catch(() => {
+        setStatus('点赞失败。', true);
+      });
   });
 
   favoriteButton?.addEventListener('click', () => {
@@ -293,7 +335,17 @@ const postTitle = post.data.title;
         'x-client-id': getClientId(),
       },
       body: JSON.stringify({ slug: postSlug, title: postTitle, action: 'favorite' }),
-    }).then(() => syncEngagement());
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || '收藏失败');
+        }
+        applyEngagementState(data);
+      })
+      .catch(() => {
+        setStatus('收藏失败。', true);
+      });
   });
 
   replyCancel?.addEventListener('click', () => {
@@ -339,7 +391,7 @@ const postTitle = post.data.title;
         commentContent.value = '';
         clearReplying();
         setStatus(data.pending ? '评论已提交，等待审核。' : '评论已发布。');
-        return syncEngagement();
+        applyEngagementState(data);
       })
       .catch((error) => {
         setStatus(error.message || '发布失败。', true);
@@ -384,7 +436,7 @@ const postTitle = post.data.title;
           throw new Error(data.error || '删除失败');
         }
         setStatus('评论已删除。');
-        return syncEngagement();
+        applyEngagementState(data);
       })
       .catch((error) => {
         setStatus(error.message || '删除失败。', true);
