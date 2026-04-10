@@ -2,6 +2,7 @@
 title: "欢迎来到 FireworksLife"
 description: "一个用 Astro 构建的炫酷个人博客，记录生活点滴和技术心得。"
 pubDate: 2026-04-10
+category: "随笔"
 tags: ["随笔", "博客"]
 ---
 

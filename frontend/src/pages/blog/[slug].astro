@@ -19,7 +19,8 @@ const { Content } = await render(post);
     <a href="/" class="back">← 返回首页</a>
     <header>
       <h1>{post.data.title}</h1>
-      <time>{post.data.pubDate.toLocaleDateString('zh-CN')}</time>
+      <time>{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</time>
+      <span class="post-category">{post.data.category}</span>
     </header>
     <div class="content">
       <Content />

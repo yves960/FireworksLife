@@ -2,83 +2,84 @@
 import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+
+// 获取所有分类
+const categories = ['全部', ...new Set(posts.map(p => p.data.category))];
 ---
 
-<Base title="FireworksLife">
-  <div class="stars"></div>
-
+<Base title="FireworksLife · 炫酷个人博客">
   <section class="hero">
-    <h1 class="glow-title">FireworksLife</h1>
-    <p class="subtitle">时间不在于你拥有多少，而在于你如何使用 ⏱️</p>
+    <h1 class="title">FireworksLife</h1>
+    <p class="subtitle">记录生活，发现美好</p>
   </section>
 
   <section class="posts">
-    <h2>最新文章</h2>
-    <div class="card-grid">
-      {posts.map((post) => (
-        <a href={`/blog/${post.id}`} class="card">
+    <!-- 分类标签 -->
+    <div class="category-tabs">
+      {categories.map(cat => (
+        <button class="category-tab" data-category={cat}>{cat}</button>
+      ))}
+    </div>
+
+    <!-- 文章列表 -->
+    <div class="posts-grid">
+      {sortedPosts.map(post => (
+        <a href={`/blog/${post.id}`} class="post-card" data-category={post.data.category}>
+          <span class="post-category">{post.data.category}</span>
           <h3>{post.data.title}</h3>
-          <time>{post.data.pubDate.toLocaleDateString('zh-CN')}</time>
-          <p>{post.data.description || ''}</p>
+          <p class="post-date">{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</p>
+          <p class="post-excerpt">{post.data.description}</p>
+          <span class="read-more">阅读更多 →</span>
         </a>
       ))}
     </div>
   </section>
 </Base>
 
+<script>
+  const tabs = document.querySelectorAll('.category-tab');
+  const cards = document.querySelectorAll('.post-card');
+
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      const category = tab.getAttribute('data-category');
+      
+      // 更新标签状态
+      tabs.forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+      
+      // 筛选文章
+      cards.forEach(card => {
+        const cardCategory = card.getAttribute('data-category');
+        if (category === '全部' || cardCategory === category) {
+          card.style.display = 'block';
+        } else {
+          card.style.display = 'none';
+        }
+      });
+    });
+  });
+</script>
+
 <style>
-  /* Stars background */
-  .stars {
-    position: fixed;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    z-index: 0;
-    background:
-      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 50%, transparent 100%),
-      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 50%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 50% 10%, rgba(139,92,246,0.6) 50%, transparent 100%),
-      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5) 50%, transparent 100%),
-      radial-gradient(1px 1px at 90% 40%, rgba(255,255,255,0.3) 50%, transparent 100%),
-      radial-gradient(1.5px 1.5px at 15% 75%, rgba(139,92,246,0.4) 50%, transparent 100%),
-      radial-gradient(1px 1px at 85% 15%, rgba(255,255,255,0.5) 50%, transparent 100%),
-      radial-gradient(1px 1px at 45% 45%, rgba(255,255,255,0.3) 50%, transparent 100%),
-      radial-gradient(1px 1px at 60% 90%, rgba(255,255,255,0.4) 50%, transparent 100%),
-      radial-gradient(1.2px 1.2px at 25% 35%, rgba(139,92,246,0.5) 50%, transparent 100%);
-    animation: twinkle 4s ease-in-out infinite alternate;
-  }
-
-  @keyframes twinkle {
-    0% { opacity: 0.6; }
-    100% { opacity: 1; }
-  }
-
   .hero {
-    position: relative;
-    z-index: 1;
     text-align: center;
-    padding: 6rem 0 4rem;
-    background: linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a1a2e 100%);
-    border-radius: 1rem;
+    padding: 4rem 0;
     margin-bottom: 3rem;
   }
 
-  .glow-title {
-    font-size: clamp(2.5rem, 6vw, 4.5rem);
+  .title {
+    font-size: 4rem;
     font-weight: 700;
-    background: linear-gradient(135deg, #8b5cf6, #a78bfa, #c4b5fd, #8b5cf6);
-    background-size: 300% 300%;
+    background: linear-gradient(135deg, #8b5cf6 0%, #c084fc 50%, #8b5cf6 100%);
+    background-size: 200% 200%;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
-    animation: float 3s ease-in-out infinite, gradient-shift 5s ease infinite;
-    text-shadow: 0 0 40px rgba(139, 92, 246, 0.3);
-  }
-
-  @keyframes float {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-10px); }
+    animation: gradient-shift 3s ease infinite;
+    margin-bottom: 1rem;
   }
 
   @keyframes gradient-shift {
@@ -87,44 +88,111 @@ const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.getTim
   }
 
   .subtitle {
-    margin-top: 1rem;
-    color: #94a3b8;
-    font-size: 1.1rem;
-    font-weight: 300;
+    font-size: 1.25rem;
+    color: var(--text-secondary);
+    animation: fade-in 1s ease-out;
   }
 
-  .posts { position: relative; z-index: 1; }
-
-  .posts h2 {
-    font-size: 1.5rem;
-    margin-bottom: 1.5rem;
-    color: #c4b5fd;
+  @keyframes fade-in {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
   }
 
-  .card-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-    gap: 1.5rem;
+  .category-tabs {
+    display: flex;
+    gap: 0.75rem;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
   }
 
-  .card {
-    display: block;
-    background: rgba(26, 10, 46, 0.5);
-    border: 1px solid rgba(139, 92, 246, 0.15);
-    border-radius: 0.75rem;
-    padding: 1.5rem;
+  .category-tab {
+    background: var(--bg-card);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    color: var(--text-secondary);
+    padding: 0.5rem 1.25rem;
+    border-radius: 999px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-family: inherit;
     transition: all 0.3s ease;
   }
 
-  .card:hover {
-    border-color: rgba(139, 92, 246, 0.5);
-    box-shadow: 0 0 25px rgba(139, 92, 246, 0.2), 0 0 60px rgba(139, 92, 246, 0.1);
-    transform: translateY(-3px);
+  .category-tab:hover {
+    border-color: var(--accent);
+    color: var(--accent);
   }
 
-  .card h3 { font-size: 1.2rem; color: #e2e8f0; margin-bottom: 0.5rem; }
+  .category-tab.active {
+    background: var(--accent);
+    border-color: var(--accent);
+    color: white;
+  }
 
-  .card time { font-size: 0.85rem; color: #64748b; display: block; margin-bottom: 0.75rem; }
+  .posts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+    gap: 2rem;
+  }
 
-  .card p { color: #94a3b8; font-size: 0.95rem; line-height: 1.6; }
+  .post-card {
+    background: var(--bg-card);
+    border-radius: 16px;
+    padding: 1.5rem;
+    text-decoration: none;
+    color: inherit;
+    border: 1px solid rgba(139, 92, 246, 0.1);
+    transition: all 0.3s ease;
+    animation: card-appear 0.6s ease-out backwards;
+  }
+
+  .post-card:nth-child(1) { animation-delay: 0.1s; }
+  .post-card:nth-child(2) { animation-delay: 0.2s; }
+  .post-card:nth-child(3) { animation-delay: 0.3s; }
+  .post-card:nth-child(4) { animation-delay: 0.4s; }
+
+  @keyframes card-appear {
+    from { opacity: 0; transform: translateY(30px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .post-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 0 30px var(--accent-glow);
+    border-color: var(--accent);
+  }
+
+  .post-category {
+    display: inline-block;
+    background: rgba(139, 92, 246, 0.2);
+    color: var(--accent);
+    padding: 0.2rem 0.6rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+
+  .post-card h3 {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+    color: var(--text-primary);
+  }
+
+  .post-date {
+    font-size: 0.85rem;
+    color: var(--text-secondary);
+    margin-bottom: 0.75rem;
+  }
+
+  .post-excerpt {
+    font-size: 0.9rem;
+    color: var(--text-secondary);
+    line-height: 1.6;
+    margin-bottom: 1rem;
+  }
+
+  .read-more {
+    font-size: 0.85rem;
+    color: var(--accent);
+    font-weight: 500;
+  }
 </style>

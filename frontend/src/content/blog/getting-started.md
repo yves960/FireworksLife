@@ -2,6 +2,7 @@
 title: "用 Astro 和 Netlify 搭建免费炫酷博客"
 description: "不用买服务器，不用懂运维，只需要 GitHub + Netlify，就能拥有一个全球加速的炫酷博客。"
 pubDate: 2026-04-10
+category: "技术"
 tags: ["技术", "Astro", "Netlify"]
 ---
 
