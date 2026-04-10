@@ -69,3 +69,29 @@ def delete_comment(comment_id: int, current_user: User = Depends(get_current_use
   db.commit()
   
   return {"message": "评论删除成功"}
+
+@router.delete("/admin/{comment_id}")
+def admin_delete_comment(
+  comment_id: int,
+  current_user: User = Depends(get_current_user),
+  db: Session = Depends(get_db)
+):
+  """管理员删除任意评论（文章作者可删除其文章下的评论）"""
+  comment = db.query(CommentModel).filter(CommentModel.id == comment_id).first()
+  if not comment:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="评论不存在")
+  
+  # 检查是否是文章作者
+  from app.models.post import Post as PostModel
+  post = db.query(PostModel).filter(PostModel.id == comment.post_id).first()
+  
+  if not post:
+    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文章不存在")
+  
+  if post.author_id != current_user.id:
+    raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="无权删除此评论")
+  
+  db.delete(comment)
+  db.commit()
+  
+  return {"message": "评论删除成功"}

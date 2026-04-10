@@ -14,6 +14,9 @@ class User(Base):
   wechat_unionid = Column(String(100), index=True)
   wechat_nickname = Column(String(100))
   wechat_avatar = Column(String(255))
+  github_id = Column(String(50), unique=True, index=True)
+  github_username = Column(String(100))
+  github_avatar = Column(String(255))
   email_verified = Column(Boolean, default=False)
   created_at = Column(DateTime, default=datetime.utcnow)
 

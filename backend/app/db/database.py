@@ -4,7 +4,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy import event
 import os
 
-DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./blog.db")
+DATABASE_PATH = os.getenv("DATABASE_PATH", "./data/blog.db")
+DATABASE_URL = f"sqlite:///{DATABASE_PATH}"
 
 connect_args = {"check_same_thread": False} if "sqlite" in DATABASE_URL else {}
 engine = create_engine(

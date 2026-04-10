@@ -1,6 +1,6 @@
-# 轻量级博客系统
+# Web 博客系统
 
-一个简洁、快速的博客系统，支持Markdown内容、评论、点赞、多种登录方式（用户名/邮箱/微信OAuth）。
+一个简洁、快速的Web博客系统，支持Markdown内容、评论、点赞、多种登录方式（用户名/邮箱/GitHub OAuth）。
 
 ## 技术栈
 
@@ -23,21 +23,57 @@
 
 ### 已实现
 - ✅ 用户注册和登录（用户名/邮箱）
+- ✅ GitHub OAuth 登录
 - ✅ JWT认证和权限验证
 - ✅ "记住我"功能
 - ✅ 文章CRUD操作
 - ✅ 文章列表和分页
 - ✅ 评论系统（支持嵌套回复）
 - ✅ 点赞功能
+- ✅ 文章分类
+- ✅ Markdown渲染
+- ✅ 深色模式
+- ✅ 管理后台
 - ✅ 数据库备份
 
 ### 计划中
 - ⏳ 邮箱验证
 - ⏳ 微信OAuth登录
-- ⏳ 炫酷视觉效果（渐变背景、粒子动画等）
-- ⏳ 深色模式
-- ⏳ 响应式设计
-- ⏳ 管理后台
+- ⏳ 炫酷视觉效果（粒子动画等）
+
+## GitHub OAuth 登录配置
+
+### 1. 创建 GitHub OAuth App
+
+1. 登录 GitHub，进入 **Settings** > **Developer settings** > **OAuth Apps** > **New OAuth App**
+2. 填写以下信息：
+   - **Application name**: FireworksLife（或你的应用名）
+   - **Homepage URL**: `http://localhost:3000`（开发环境）或你的生产域名
+   - **Authorization callback URL**: `http://localhost:3000/auth/github/callback`
+3. 创建后，复制 **Client ID**
+4. 点击 **Generate a new client secret**，复制 **Client Secret**
+
+### 2. 配置环境变量
+
+在 `backend/.env` 文件中添加以下配置：
+
+```bash
+GITHUB_CLIENT_ID=你的_client_id
+GITHUB_CLIENT_SECRET=你的_client_secret
+GITHUB_REDIRECT_URI=http://localhost:3000/auth/github/callback
+```
+
+### 3. 运行数据库迁移
+
+```bash
+cd backend
+source .venv/bin/activate
+python -m app.db.migrate_add_github
+```
+
+### 4. 重启服务
+
+重启后端服务后，登录页面将显示 "GitHub 登录" 按钮。
 
 ## Python版本要求
 

@@ -13,6 +13,9 @@ class Settings(BaseSettings):
   SMTP_FROM: str = ""
   WECHAT_APP_ID: str = ""
   WECHAT_APP_SECRET: str = ""
+  GITHUB_CLIENT_ID: str = ""
+  GITHUB_CLIENT_SECRET: str = ""
+  GITHUB_REDIRECT_URI: str = "http://localhost:3000/auth/github/callback"
   FRONTEND_URL: str = "http://localhost:3000"
 
   class Config:

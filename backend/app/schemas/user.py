@@ -26,6 +26,8 @@ class User(UserBase):
   email_verified: bool
   wechat_nickname: Optional[str] = None
   wechat_avatar: Optional[str] = None
+  github_username: Optional[str] = None
+  github_avatar: Optional[str] = None
   created_at: datetime
 
   model_config = {"from_attributes": True}

@@ -1,5 +1,5 @@
 from app.db.database import engine
-from app.models import user, post, comment, like, email_verification
+from app.models import user, category, post, comment, like, email_verification
 
 def init_db():
   from app.db.database import Base

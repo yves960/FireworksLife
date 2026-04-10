@@ -21,6 +21,7 @@ class Post(Base):
   updated_at = Column(DateTime, default=datetime.utcnow, onupdate=datetime.utcnow)
   status = Column(Enum(PostStatus, values_callable=lambda obj: [e.value for e in obj]), default=PostStatus.DRAFT)
   slug = Column(String(200), unique=True, index=True)
+  view_count = Column(Integer, default=0)
 
   author = relationship("User", back_populates="posts")
   category = relationship("Category", back_populates="posts")

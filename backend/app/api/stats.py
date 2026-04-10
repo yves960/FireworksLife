@@ -1,5 +1,6 @@
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
+from sqlalchemy import func
 from app.db.database import get_db
 from app.models.post import Post as PostModel, PostStatus
 from app.models.comment import Comment as CommentModel
@@ -26,6 +27,11 @@ def get_dashboard_stats(
     PostModel.status == PostStatus.DRAFT
   ).count()
   
+  # 总访问量
+  total_views = db.query(PostModel).with_entities(
+    func.sum(PostModel.view_count)
+  ).scalar() or 0
+  
   # 评论统计
   total_comments = db.query(CommentModel).count()
   
@@ -46,6 +52,7 @@ def get_dashboard_stats(
       "id": post.id,
       "title": post.title,
       "status": post.status.value,
+      "view_count": post.view_count or 0,
       "created_at": post.created_at.isoformat()
     })
   
@@ -54,6 +61,9 @@ def get_dashboard_stats(
       "total": total_posts,
       "published": published_posts,
       "draft": draft_posts
+    },
+    "views": {
+      "total": total_views
     },
     "comments": {
       "total": total_comments

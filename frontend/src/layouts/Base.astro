@@ -1,0 +1,182 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const { title, description = "FireworksLife - 一个炫酷的个人博客" } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  </head>
+  <body>
+    <nav>
+      <div class="nav-content">
+        <a href="/" class="logo">FireworksLife</a>
+        <div class="nav-links">
+          <a href="/">首页</a>
+          <a href="/about">关于</a>
+        </div>
+      </div>
+    </nav>
+
+    <main>
+      <slot />
+    </main>
+
+    <footer>
+      <p>© 2026 FireworksLife · 用 Astro 构建</p>
+    </footer>
+
+    <style is:global>
+      :root {
+        --bg-primary: #0a0a1a;
+        --bg-secondary: #1a0a2e;
+        --bg-card: #12122a;
+        --text-primary: #e2e8f0;
+        --text-secondary: #94a3b8;
+        --accent: #8b5cf6;
+        --accent-glow: rgba(139, 92, 246, 0.5);
+      }
+
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      html {
+        font-family: 'Space Grotesk', sans-serif;
+        background: linear-gradient(135deg, var(--bg-primary) 0%, var(--bg-secondary) 50%, #0a1a2e 100%);
+        color: var(--text-primary);
+        min-height: 100vh;
+      }
+
+      body {
+        min-height: 100vh;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      /* 粒子背景 */
+      body::before {
+        content: '';
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: 
+          radial-gradient(2px 2px at 20px 30px, rgba(255,255,255,0.3), transparent),
+          radial-gradient(2px 2px at 40px 70px, rgba(139,92,246,0.4), transparent),
+          radial-gradient(1px 1px at 90px 40px, rgba(255,255,255,0.2), transparent),
+          radial-gradient(2px 2px at 130px 80px, rgba(139,92,246,0.3), transparent),
+          radial-gradient(1px 1px at 160px 120px, rgba(255,255,255,0.3), transparent);
+        background-repeat: repeat;
+        background-size: 200px 150px;
+        animation: sparkle 8s linear infinite;
+        pointer-events: none;
+        z-index: 0;
+      }
+
+      @keyframes sparkle {
+        0% { opacity: 0.5; }
+        50% { opacity: 1; }
+        100% { opacity: 0.5; }
+      }
+
+      /* 导航栏 */
+      nav {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        z-index: 100;
+        background: rgba(10, 10, 26, 0.8);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+      }
+
+      .nav-content {
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 1rem 2rem;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+      }
+
+      .logo {
+        font-size: 1.5rem;
+        font-weight: 700;
+        color: var(--accent);
+        text-decoration: none;
+        letter-spacing: -0.02em;
+      }
+
+      .nav-links {
+        display: flex;
+        gap: 2rem;
+      }
+
+      .nav-links a {
+        color: var(--text-secondary);
+        text-decoration: none;
+        transition: color 0.3s;
+      }
+
+      .nav-links a:hover {
+        color: var(--accent);
+      }
+
+      /* 主内容 */
+      main {
+        position: relative;
+        z-index: 1;
+        max-width: 1200px;
+        margin: 0 auto;
+        padding: 8rem 2rem 4rem;
+        min-height: calc(100vh - 200px);
+      }
+
+      /* 页脚 */
+      footer {
+        position: relative;
+        z-index: 1;
+        text-align: center;
+        padding: 2rem;
+        color: var(--text-secondary);
+        font-size: 0.875rem;
+        border-top: 1px solid rgba(139, 92, 246, 0.1);
+      }
+
+      /* 滚动条 */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: var(--bg-primary);
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: var(--accent);
+        border-radius: 4px;
+      }
+
+      ::selection {
+        background: var(--accent);
+        color: white;
+      }
+    </style>
+  </body>
+</html>

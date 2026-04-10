@@ -60,11 +60,14 @@ def get_posts(
   status: Optional[PostStatus] = None,
   category_id: Optional[int] = None,
   tag: Optional[str] = None,
+  all: bool = False,
   db: Session = Depends(get_db)
 ):
   query = db.query(PostModel)
   
-  if status:
+  if all:
+    pass  # 返回所有状态
+  elif status:
     query = query.filter(PostModel.status == status)
   else:
     query = query.filter(PostModel.status == PostStatus.PUBLISHED)
@@ -112,6 +115,10 @@ def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
   if not post:
     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="文章不存在")
   
+  # 增加访问量
+  post.view_count = (post.view_count or 0) + 1
+  db.commit()
+  
   # 渲染 Markdown 内容
   rendered_content = render_markdown(post.content)
   summary = get_plain_text_summary(post.content, 200)
@@ -127,7 +134,8 @@ def get_post_by_id(post_id: int, db: Session = Depends(get_db)):
     created_at=post.created_at,
     updated_at=post.updated_at,
     rendered_content=rendered_content,
-    summary=summary
+    summary=summary,
+    view_count=post.view_count
   )
 
 @router.put("/{post_id}", response_model=Post)
@@ -172,3 +180,38 @@ def delete_post(post_id: int, current_user: User = Depends(get_current_user), db
   db.commit()
   
   return {"message": "文章删除成功"}
+
+# 批量操作 API
+@router.post("/batch/delete")
+def batch_delete_posts(
+  post_ids: List[int],
+  current_user: User = Depends(get_current_user),
+  db: Session = Depends(get_db)
+):
+  """批量删除文章"""
+  deleted = 0
+  for post_id in post_ids:
+    post = get_post(db, post_id)
+    if post and post.author_id == current_user.id:
+      db.delete(post)
+      deleted += 1
+  db.commit()
+  return {"message": f"成功删除 {deleted} 篇文章", "deleted": deleted}
+
+@router.post("/batch/status")
+def batch_update_status(
+  post_ids: List[int],
+  new_status: PostStatus,
+  current_user: User = Depends(get_current_user),
+  db: Session = Depends(get_db)
+):
+  """批量更改文章状态"""
+  updated = 0
+  for post_id in post_ids:
+    post = get_post(db, post_id)
+    if post and post.author_id == current_user.id:
+      post.status = new_status
+      post.updated_at = datetime.utcnow()
+      updated += 1
+  db.commit()
+  return {"message": f"成功更新 {updated} 篇文章状态", "updated": updated}

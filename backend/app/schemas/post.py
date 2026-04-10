@@ -38,6 +38,7 @@ class PostDetail(Post):
   """文章详情，包含渲染后的内容"""
   rendered_content: Optional[str] = None
   summary: Optional[str] = None
+  view_count: int = 0
 
 class PostList(BaseModel):
   id: int
