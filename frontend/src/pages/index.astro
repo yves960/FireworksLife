@@ -51,16 +51,24 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
 
       <div class="hero-brand">
         <div class="brand-emblem">
-          <span class="brand-disc"></span>
-          <span class="brand-wave wave-a"></span>
-          <span class="brand-wave wave-b"></span>
-          <span class="brand-wave wave-c"></span>
-          <span class="brand-initials">FL</span>
+          <span class="brand-grid"></span>
+          <span class="brand-ring ring-a"></span>
+          <span class="brand-ring ring-b"></span>
+          <span class="brand-ring ring-c"></span>
+          <span class="brand-node node-a"></span>
+          <span class="brand-node node-b"></span>
+          <span class="brand-node node-c"></span>
+          <span class="brand-node node-d"></span>
+          <span class="brand-chip">
+            <span class="chip-core"></span>
+            <span class="chip-pulse"></span>
+            <span class="chip-text">AI</span>
+          </span>
         </div>
         <div class="brand-copy">
           <p class="brand-kicker">Signal Core</p>
-          <h2>把博客首页做成你的数字海报。</h2>
-          <p>不是堆内容，而是先建立气质。这个区域现在更像一张动态封面，而不是普通侧栏卡片。</p>
+          <h2>把入口做成一枚正在运转的智能核心。</h2>
+          <p>这块不再是抽象圆盘，而是更像 AI 中枢界面: 有芯片核心、环形扫描、节点连线和数据轨道。</p>
         </div>
       </div>
 
@@ -487,50 +495,148 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     margin: 0 auto;
     display: grid;
     place-items: center;
-  }
-
-  .brand-disc {
-    position: absolute;
-    inset: 16%;
-    border-radius: 999px;
+    border-radius: 32px;
     background:
-      radial-gradient(circle at 35% 35%, rgba(255, 255, 255, 0.95), transparent 18%),
-      linear-gradient(135deg, rgba(255, 122, 24, 0.95), rgba(255, 95, 158, 0.78) 55%, rgba(94, 234, 212, 0.78));
-    box-shadow:
-      0 0 40px rgba(255, 122, 24, 0.22),
-      0 0 90px rgba(94, 234, 212, 0.12);
+      radial-gradient(circle at 50% 50%, rgba(103, 184, 230, 0.18), transparent 42%),
+      linear-gradient(180deg, rgba(8, 17, 31, 0.72), rgba(8, 17, 31, 0.18));
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    overflow: hidden;
   }
 
-  .brand-wave {
+  .brand-grid {
     position: absolute;
-    inset: 2%;
+    inset: 0;
+    background:
+      linear-gradient(rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px);
+    background-size: 18px 18px;
+    mask-image: radial-gradient(circle at center, rgba(0, 0, 0, 0.9), transparent 86%);
+    opacity: 0.4;
+  }
+
+  .brand-ring,
+  .brand-chip,
+  .chip-core,
+  .chip-pulse,
+  .brand-node {
+    position: absolute;
+  }
+
+  .brand-ring {
     border-radius: 999px;
-    border: 1px solid rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(113, 218, 239, 0.24);
+    box-shadow: inset 0 0 24px rgba(94, 234, 212, 0.06);
   }
 
-  .wave-a {
-    animation: spin 20s linear infinite;
+  .ring-a {
+    inset: 8%;
+    animation: spin 18s linear infinite;
   }
 
-  .wave-b {
-    inset: 12%;
+  .ring-b {
+    inset: 20%;
     border-style: dashed;
-    animation: spin 15s linear infinite reverse;
+    border-color: rgba(255, 179, 71, 0.3);
+    animation: spin 12s linear infinite reverse;
   }
 
-  .wave-c {
-    inset: 24%;
-    opacity: 0.6;
+  .ring-c {
+    inset: 31%;
+    border-color: rgba(255, 255, 255, 0.14);
+    opacity: 0.8;
     animation: pulse-ring 2.6s ease-in-out infinite;
   }
 
-  .brand-initials {
+  .brand-node {
+    width: 0.72rem;
+    height: 0.72rem;
+    border-radius: 999px;
+    background: #dffaf7;
+    box-shadow: 0 0 0 0.22rem rgba(94, 234, 212, 0.12);
+  }
+
+  .node-a {
+    top: 16%;
+    left: 48%;
+  }
+
+  .node-b {
+    right: 18%;
+    top: 46%;
+    background: #ffd9a3;
+    box-shadow: 0 0 0 0.22rem rgba(255, 179, 71, 0.12);
+  }
+
+  .node-c {
+    bottom: 20%;
+    left: 23%;
+  }
+
+  .node-d {
+    bottom: 24%;
+    right: 28%;
+    width: 0.58rem;
+    height: 0.58rem;
+    background: #f9a7c6;
+    box-shadow: 0 0 0 0.2rem rgba(255, 95, 158, 0.12);
+  }
+
+  .brand-chip {
+    inset: 31%;
+    border-radius: 28px;
+    background:
+      linear-gradient(180deg, rgba(11, 24, 43, 0.96), rgba(8, 17, 31, 0.92)),
+      linear-gradient(135deg, rgba(94, 234, 212, 0.2), rgba(255, 122, 24, 0.12));
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: grid;
+    place-items: center;
+    box-shadow:
+      inset 0 0 0 1px rgba(255, 255, 255, 0.04),
+      0 18px 40px rgba(0, 0, 0, 0.28);
+  }
+
+  .brand-chip::before,
+  .brand-chip::after {
+    content: "";
+    position: absolute;
+    inset: 14%;
+    border-radius: 22px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .brand-chip::after {
+    inset: auto 18% 18% 18%;
+    height: 1px;
+    border: 0;
+    background: linear-gradient(90deg, transparent, rgba(94, 234, 212, 0.5), transparent);
+  }
+
+  .chip-core {
+    inset: 26%;
+    border-radius: 22px;
+    background:
+      radial-gradient(circle at 50% 40%, rgba(255, 255, 255, 0.26), transparent 24%),
+      linear-gradient(135deg, rgba(94, 234, 212, 0.25), rgba(91, 144, 255, 0.22) 48%, rgba(255, 122, 24, 0.18));
+    border: 1px solid rgba(94, 234, 212, 0.16);
+  }
+
+  .chip-pulse {
+    inset: 18%;
+    border-radius: 24px;
+    border: 1px solid rgba(94, 234, 212, 0.2);
+    animation: pulse-ring 2.2s ease-in-out infinite;
+  }
+
+  .chip-text {
     position: relative;
     z-index: 1;
-    font-size: clamp(2.2rem, 5vw, 3.3rem);
+    font-size: clamp(2.1rem, 4vw, 3rem);
     font-weight: 700;
-    letter-spacing: -0.08em;
-    color: #08111f;
+    letter-spacing: 0.08em;
+    color: #e9fcfb;
+    text-shadow:
+      0 0 18px rgba(94, 234, 212, 0.2),
+      0 0 32px rgba(91, 144, 255, 0.12);
   }
 
   .brand-copy {
