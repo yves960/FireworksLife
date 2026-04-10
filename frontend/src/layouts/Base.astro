@@ -19,6 +19,19 @@ const { title, description = "FireworksLife - 一个炫酷的个人博客" } = A
     <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet">
   </head>
   <body>
+    <!-- 宠物 -->
+    <div class="pet" id="pet">
+      <div class="pet-body">
+        <div class="pet-face">
+          <div class="pet-eyes">
+            <span class="eye"></span>
+            <span class="eye"></span>
+          </div>
+          <div class="pet-mouth"></div>
+        </div>
+      </div>
+    </div>
+
     <nav>
       <div class="nav-content">
         <a href="/" class="logo">FireworksLife</a>
@@ -177,6 +190,131 @@ const { title, description = "FireworksLife - 一个炫酷的个人博客" } = A
         background: var(--accent);
         color: white;
       }
+
+      /* 宠物样式 */
+      .pet {
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 9999;
+        cursor: pointer;
+        transition: transform 0.3s ease;
+      }
+
+      .pet:hover {
+        transform: scale(1.1);
+      }
+
+      .pet-body {
+        width: 60px;
+        height: 60px;
+        background: linear-gradient(135deg, #8b5cf6 0%, #a78bfa 100%);
+        border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%;
+        position: relative;
+        box-shadow: 0 4px 20px rgba(139, 92, 246, 0.4);
+        animation: float 3s ease-in-out infinite;
+      }
+
+      @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+      }
+
+      .pet-face {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 80%;
+        height: 80%;
+      }
+
+      .pet-eyes {
+        display: flex;
+        justify-content: center;
+        gap: 12px;
+        margin-bottom: 8px;
+      }
+
+      .eye {
+        width: 10px;
+        height: 14px;
+        background: white;
+        border-radius: 50%;
+        position: relative;
+        animation: blink 4s ease-in-out infinite;
+      }
+
+      .eye::after {
+        content: '';
+        position: absolute;
+        width: 6px;
+        height: 6px;
+        background: #1a1a2e;
+        border-radius: 50%;
+        top: 4px;
+        left: 2px;
+        animation: look 5s ease-in-out infinite;
+      }
+
+      @keyframes blink {
+        0%, 45%, 55%, 100% { transform: scaleY(1); }
+        50% { transform: scaleY(0.1); }
+      }
+
+      @keyframes look {
+        0%, 100% { transform: translate(0, 0); }
+        25% { transform: translate(2px, 1px); }
+        50% { transform: translate(-2px, 1px); }
+        75% { transform: translate(1px, -1px); }
+      }
+
+      .pet-mouth {
+        width: 12px;
+        height: 6px;
+        background: #1a1a2e;
+        border-radius: 0 0 10px 10px;
+        margin: 0 auto;
+        animation: smile 3s ease-in-out infinite;
+      }
+
+      @keyframes smile {
+        0%, 100% { transform: scaleX(1); }
+        50% { transform: scaleX(1.2); }
+      }
     </style>
+
+    <script>
+      const pet = document.getElementById('pet');
+      let posX = window.innerWidth - 80;
+      let posY = window.innerHeight - 80;
+      let targetX = posX;
+      let targetY = posY;
+
+      document.addEventListener('mousemove', (e) => {
+        targetX = e.clientX - 30;
+        targetY = e.clientY - 30;
+        
+        // Clamp to viewport
+        targetX = Math.max(0, Math.min(targetX, window.innerWidth - 60));
+        targetY = Math.max(0, Math.min(targetY, window.innerHeight - 60));
+      });
+
+      function animate() {
+        // Smooth follow
+        posX += (targetX - posX) * 0.08;
+        posY += (targetY - posY) * 0.08;
+        
+        if (pet) {
+          pet.style.left = posX + 'px';
+          pet.style.top = posY + 'px';
+          pet.style.right = 'auto';
+        }
+        
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
   </body>
 </html>
