@@ -2,47 +2,47 @@
 import Base from '../layouts/Base.astro';
 ---
 
-<Base title="关于 · FireworksLife">
+<Base title="关于 · FireworksLife" description="关于 FireworksLife 的写作方向、技术栈和站点理念。">
   <article class="about">
-    <header class="about-header">
-      <h1>关于 FireworksLife</h1>
-      <p class="tagline">记录生活，发现美好</p>
-    </header>
+    <section class="about-hero">
+      <p class="eyebrow">About This Space</p>
+      <h1>不是只放文章的地方，是一个持续生长的个人界面。</h1>
+      <p class="lead">
+        FireworksLife 用 Astro 搭底座，但真正想做的不是“再一个博客”，而是把写作、设计和个人表达整合成一个更完整的数字名片。
+      </p>
+    </section>
 
-    <section class="about-content">
-      <div class="intro">
+    <section class="about-grid">
+      <div class="about-card">
+        <h2>这个站点在写什么</h2>
         <p>
-          FireworksLife 是一个用 <strong>Astro</strong> 构建的个人博客。
-          追求的是超快的加载速度、炫酷的视觉效果，以及纯粹的阅读体验。
+          这里会记录 AI 工具链、工程方法、开发体验优化，也会留下少量更个人化的观察。内容不会只追求教程感，
+          也会保留观点、判断和情绪纹理。
         </p>
       </div>
 
-      <div class="tech-stack">
+      <div class="about-card highlight">
+        <h2>想要的气质</h2>
+        <blockquote>
+          生活像烟火，技术像骨架。好的个人站点，应该两者都看得见。
+        </blockquote>
+        <p>所以这个博客会同时在意速度、排版、氛围和表达密度，而不是只把页面做成文章列表。</p>
+      </div>
+
+      <div class="about-card">
         <h2>技术栈</h2>
         <ul>
-          <li><strong>Astro</strong> — 静态站点生成器，默认零 JS</li>
-          <li><strong>Netlify</strong> — 全球 CDN 部署</li>
-          <li><strong>GitHub</strong> — 代码托管与自动部署</li>
-          <li><strong>Markdown</strong> — 纯文本写作，无负担</li>
+          <li><strong>Astro</strong>：静态优先，页面干净，性能稳。</li>
+          <li><strong>Markdown / MDX</strong>：写作简单，迁移成本低。</li>
+          <li><strong>Netlify</strong>：部署直接，适合个人内容站。</li>
+          <li><strong>GitHub</strong>：版本管理和持续演进的记录面。</li>
         </ul>
       </div>
 
-      <div class="philosophy">
-        <h2>理念</h2>
-        <blockquote>
-          生活就像烟火，短暂而璀璨。每一个想法、每一次发现、每一段经历，都值得被记录。
-        </blockquote>
-        <p>
-          这个博客会记录技术心得、生活感悟、项目分享。不追求完美，只追求真实。
-        </p>
-      </div>
-
-      <div class="contact">
-        <h2>联系方式</h2>
-        <p>如果你有任何想法或建议，欢迎通过以下方式交流：</p>
-        <ul>
-          <li>GitHub: <a href="https://github.com/yves960" target="_blank">@yves960</a></li>
-        </ul>
+      <div class="about-card">
+        <h2>联系</h2>
+        <p>如果你想交流站点设计、Agent 工程、博客系统或者别的想法，可以在 GitHub 上找到我。</p>
+        <p><a href="https://github.com/yves960" target="_blank" rel="noreferrer">@yves960</a></p>
       </div>
     </section>
   </article>
@@ -50,100 +50,114 @@ import Base from '../layouts/Base.astro';
 
 <style>
   .about {
-    max-width: 720px;
+    max-width: 1040px;
     margin: 0 auto;
-    padding: 2rem 0;
+    padding: 1rem 0 2rem;
   }
 
-  .about-header {
-    text-align: center;
-    margin-bottom: 4rem;
-    animation: fade-in 0.6s ease-out;
+  .about-hero,
+  .about-card {
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, rgba(9, 17, 31, 0.8), rgba(12, 24, 43, 0.72));
+    backdrop-filter: blur(16px);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
   }
 
-  .about-header h1 {
-    font-size: clamp(2rem, 5vw, 3rem);
-    font-weight: 700;
-    background: linear-gradient(135deg, #8b5cf6, #c084fc);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-    margin-bottom: 0.5rem;
+  .about-hero {
+    padding: clamp(2rem, 4vw, 3rem);
+    border-radius: 30px;
   }
 
-  .tagline {
-    color: var(--text-secondary);
-    font-size: 1.1rem;
-  }
-
-  .about-content {
-    animation: content-appear 0.8s ease-out 0.2s backwards;
-  }
-
-  @keyframes fade-in {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  @keyframes content-appear {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .intro {
-    font-size: 1.1rem;
-    line-height: 1.8;
-    color: var(--text-primary);
-    margin-bottom: 3rem;
-  }
-
-  .tech-stack, .philosophy, .contact {
-    margin-bottom: 3rem;
-  }
-
-  h2 {
-    font-size: 1.35rem;
-    color: #c4b5fd;
+  .eyebrow {
     margin-bottom: 1rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(139, 92, 246, 0.2);
+    color: var(--accent-soft);
+    letter-spacing: 0.24em;
+    text-transform: uppercase;
+    font-size: 0.78rem;
   }
 
-  ul {
-    list-style: none;
-    padding: 0;
+  .about-hero h1 {
+    max-width: 12ch;
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    line-height: 0.96;
+    letter-spacing: -0.05em;
   }
 
-  ul li {
-    padding: 0.5rem 0;
+  .lead {
+    max-width: 44rem;
+    margin-top: 1.25rem;
     color: var(--text-secondary);
-    border-bottom: 1px solid rgba(139, 92, 246, 0.05);
+    font-size: 1.05rem;
+    line-height: 1.85;
   }
 
-  ul li:last-child {
-    border-bottom: none;
+  .about-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 1.2rem;
+    margin-top: 1.2rem;
   }
 
-  ul li strong {
-    color: var(--text-primary);
+  .about-card {
+    border-radius: 26px;
+    padding: 1.5rem;
+  }
+
+  .about-card h2 {
+    margin-bottom: 0.9rem;
+    font-size: 1.4rem;
+  }
+
+  .about-card p,
+  .about-card li {
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .about-card ul {
+    padding-left: 1.2rem;
+  }
+
+  .about-card li + li {
+    margin-top: 0.35rem;
+  }
+
+  .highlight {
+    background:
+      linear-gradient(180deg, rgba(9, 17, 31, 0.76), rgba(12, 24, 43, 0.72)),
+      radial-gradient(circle at top right, rgba(255, 122, 24, 0.18), transparent 35%);
   }
 
   blockquote {
-    border-left: 3px solid #8b5cf6;
-    padding-left: 1.5rem;
-    margin: 1.5rem 0;
-    font-size: 1.15rem;
-    color: #c4b5fd;
-    font-style: italic;
+    margin-bottom: 1rem;
+    padding-left: 1rem;
+    border-left: 3px solid var(--accent);
+    color: #fff1d8;
+    font-size: 1.08rem;
+    line-height: 1.8;
   }
 
-  .contact a {
-    color: #8b5cf6;
+  a {
+    color: var(--accent-soft);
     text-decoration: none;
-    transition: color 0.3s;
   }
 
-  .contact a:hover {
-    color: #a78bfa;
+  a:hover {
+    color: #ffe0b0;
+  }
+
+  @media (max-width: 760px) {
+    .about-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .about-hero,
+    .about-card {
+      border-radius: 22px;
+    }
+
+    .about-hero h1 {
+      max-width: none;
+    }
   }
 </style>
