@@ -1,5 +1,7 @@
 import { getStore } from '@netlify/blobs';
 
+const MODERATION_MODE = 'auto';
+
 const json = (status, body) =>
   new Response(JSON.stringify(body), {
     status,
@@ -24,12 +26,22 @@ const sanitizeSlug = (value) =>
 const getClientId = (request, url) =>
   request.headers.get('x-client-id') || url.searchParams.get('clientId') || '';
 
+const toPublicComments = (comments = []) =>
+  comments
+    .filter((item) => item.status === 'approved')
+    .filter((item) => !item.parentId)
+    .map((item) => ({
+      ...item,
+      replies: comments.filter((reply) => reply.parentId === item.id && reply.status === 'approved'),
+    }));
+
 async function getPostState(slug) {
   const store = getStore('yufu-engagement');
   return (
     (await store.get(`posts/${slug}`, { type: 'json' })) || {
       comments: [],
       likesBy: {},
+      rateLimit: {},
     }
   );
 }
@@ -70,10 +82,11 @@ export default async (request) => {
     const favorites = await getFavorites(clientId);
 
     return json(200, {
+      moderationMode: MODERATION_MODE,
       liked: Boolean(clientId && postState.likesBy?.[clientId]),
       likesCount: Object.keys(postState.likesBy || {}).length,
       favorited: favorites.some((item) => item.slug === slug),
-      comments: postState.comments || [],
+      comments: toPublicComments(postState.comments || []),
     });
   }
 
@@ -131,23 +144,68 @@ export default async (request) => {
   }
 
   if (action === 'comment') {
+    if (!clientId) {
+      return json(400, { error: '缺少客户端标识' });
+    }
+
     const author = sanitizeText(body.author || '匿名', 24);
     const content = sanitizeText(body.content, 300);
+    const parentId = sanitizeText(body.parentId, 80);
 
     if (!content) {
       return json(400, { error: '评论不能为空' });
     }
 
+    if (parentId && !(postState.comments || []).some((item) => item.id === parentId)) {
+      return json(400, { error: '回复目标不存在' });
+    }
+
+    const now = Date.now();
+    const lastCommentAt = postState.rateLimit?.[clientId] || 0;
+    if (now - lastCommentAt < 15_000) {
+      return json(429, { error: '发得有点快，15 秒后再试。' });
+    }
+
     postState.comments ||= [];
+    postState.rateLimit ||= {};
     postState.comments.push({
       id: crypto.randomUUID(),
+      clientId,
       author,
       content,
+      parentId: parentId || '',
+      status: MODERATION_MODE === 'manual' ? 'pending' : 'approved',
       createdAt: new Date().toISOString(),
     });
+    postState.rateLimit[clientId] = now;
 
     await savePostState(slug, postState);
-    return json(200, { comments: postState.comments });
+    return json(200, {
+      moderationMode: MODERATION_MODE,
+      pending: MODERATION_MODE === 'manual',
+      comments: toPublicComments(postState.comments),
+    });
+  }
+
+  if (action === 'delete-comment') {
+    if (!clientId) {
+      return json(400, { error: '缺少客户端标识' });
+    }
+
+    const commentId = sanitizeText(body.commentId, 80);
+    const target = (postState.comments || []).find((item) => item.id === commentId);
+
+    if (!target) {
+      return json(404, { error: '评论不存在' });
+    }
+
+    if (target.clientId !== clientId) {
+      return json(403, { error: '只能删除自己的评论' });
+    }
+
+    postState.comments = (postState.comments || []).filter((item) => item.id !== commentId && item.parentId !== commentId);
+    await savePostState(slug, postState);
+    return json(200, { comments: toPublicComments(postState.comments) });
   }
 
   return json(400, { error: '不支持的 action' });

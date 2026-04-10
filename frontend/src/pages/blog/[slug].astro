@@ -103,9 +103,15 @@ const postTitle = post.data.title;
       <form class="comment-form" id="commentForm">
         <input id="commentAuthor" type="text" maxlength="24" placeholder="你的名字" />
         <textarea id="commentContent" rows="4" maxlength="300" placeholder="写点想法、反馈或者吐槽"></textarea>
+        <input id="replyParentId" type="hidden" value="" />
+        <div class="replying-banner" id="replyingBanner" style="display: none;">
+          <span id="replyingText"></span>
+          <button type="button" class="reply-cancel" id="replyCancel">取消回复</button>
+        </div>
         <button type="submit" class="comment-submit">发布评论</button>
       </form>
 
+      <p class="comment-status" id="commentStatus"></p>
       <div class="comment-list" id="commentList"></div>
       <p class="comment-empty" id="commentEmpty">还没有评论，来留下第一条。</p>
     </section>
@@ -128,6 +134,12 @@ const postTitle = post.data.title;
   const commentContent = document.getElementById('commentContent') as HTMLTextAreaElement | null;
   const commentList = document.getElementById('commentList');
   const commentEmpty = document.getElementById('commentEmpty');
+  const commentStatus = document.getElementById('commentStatus');
+  const commentSubmit = document.querySelector('.comment-submit') as HTMLButtonElement | null;
+  const replyParentId = document.getElementById('replyParentId') as HTMLInputElement | null;
+  const replyingBanner = document.getElementById('replyingBanner');
+  const replyingText = document.getElementById('replyingText');
+  const replyCancel = document.getElementById('replyCancel') as HTMLButtonElement | null;
 
   const postSlug = engagementBar?.dataset.postSlug || commentsShell?.dataset.postSlug || '';
   const postTitle = engagementBar?.dataset.postTitle || commentsShell?.dataset.postTitle || '';
@@ -142,8 +154,15 @@ const postTitle = post.data.title;
     return current;
   };
 
-  const renderComments = (items: Array<{ author: string; content: string; createdAt: string }>) => {
+  const setStatus = (message = '', isError = false) => {
+    if (!commentStatus) return;
+    commentStatus.textContent = message;
+    commentStatus.classList.toggle('is-error', isError);
+  };
+
+  const renderComments = (items: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string; replies?: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string }> }>) => {
     if (!commentList || !commentEmpty) return;
+    const clientId = getClientId();
 
     commentList.innerHTML = items
       .slice()
@@ -151,15 +170,70 @@ const postTitle = post.data.title;
       .map((item) => `
         <article class="comment-item">
           <div class="comment-item-head">
-            <strong>${item.author}</strong>
-            <time>${new Date(item.createdAt).toLocaleString('zh-CN')}</time>
+            <div class="comment-author-row">
+              <strong>${item.author}</strong>
+              <time>${new Date(item.createdAt).toLocaleString('zh-CN')}</time>
+            </div>
+            <div class="comment-actions">
+              <button type="button" class="comment-reply" data-comment-id="${item.id}" data-comment-author="${item.author}">回复</button>
+              ${
+                item.clientId === clientId
+                  ? `<button type="button" class="comment-delete" data-comment-id="${item.id}">删除</button>`
+                  : ''
+              }
+            </div>
           </div>
           <p>${item.content}</p>
+          ${
+            item.replies?.length
+              ? `<div class="reply-list">
+                  ${item.replies
+                    .slice()
+                    .reverse()
+                    .map(
+                      (reply) => `
+                        <article class="reply-item">
+                          <div class="comment-item-head">
+                            <div class="comment-author-row">
+                              <strong>${reply.author}</strong>
+                              <time>${new Date(reply.createdAt).toLocaleString('zh-CN')}</time>
+                            </div>
+                            <div class="comment-actions">
+                              ${
+                                reply.clientId === clientId
+                                  ? `<button type="button" class="comment-delete" data-comment-id="${reply.id}">删除</button>`
+                                  : ''
+                              }
+                            </div>
+                          </div>
+                          <p>${reply.content}</p>
+                        </article>
+                      `
+                    )
+                    .join('')}
+                </div>`
+              : ''
+          }
         </article>
       `)
       .join('');
 
     commentEmpty.style.display = items.length ? 'none' : 'block';
+  };
+
+  const clearReplying = () => {
+    if (replyParentId) {
+      replyParentId.value = '';
+    }
+    if (replyingBanner) {
+      replyingBanner.style.display = 'none';
+    }
+    if (replyingText) {
+      replyingText.textContent = '';
+    }
+    if (commentSubmit) {
+      commentSubmit.textContent = '发布评论';
+    }
   };
 
   const syncEngagement = () => {
@@ -183,12 +257,18 @@ const postTitle = post.data.title;
         likeButton?.classList.toggle('is-active', Boolean(data.liked));
         favoriteButton?.classList.toggle('is-active', Boolean(data.favorited));
         renderComments(Array.isArray(data.comments) ? data.comments : []);
+        setStatus('');
+
+        if (commentEmpty && data.moderationMode === 'manual' && !data.comments?.length) {
+          commentEmpty.textContent = '公开评论为空，新的留言会先进入待审核状态。';
+        }
       })
       .catch(() => {
         if (commentEmpty) {
           commentEmpty.textContent = '互动服务暂时不可用。';
           commentEmpty.style.display = 'block';
         }
+        setStatus('互动服务暂时不可用。', true);
       });
   };
 
@@ -216,13 +296,32 @@ const postTitle = post.data.title;
     }).then(() => syncEngagement());
   });
 
+  replyCancel?.addEventListener('click', () => {
+    clearReplying();
+    setStatus('');
+  });
+
   commentForm?.addEventListener('submit', (event) => {
     event.preventDefault();
-    if (!postSlug || !commentAuthor || !commentContent) return;
+    if (!postSlug || !commentAuthor || !commentContent || !replyParentId) return;
 
     const author = commentAuthor.value.trim() || '匿名';
     const content = commentContent.value.trim();
-    if (!content) return;
+    if (!content) {
+      setStatus('评论不能为空。', true);
+      return;
+    }
+
+    if (content.length < 2) {
+      setStatus('评论至少写两个字。', true);
+      return;
+    }
+
+    setStatus('正在发布...');
+    if (commentSubmit) {
+      commentSubmit.disabled = true;
+      commentSubmit.textContent = '发布中...';
+    }
 
     fetch('/.netlify/functions/engagement', {
       method: 'POST',
@@ -230,11 +329,66 @@ const postTitle = post.data.title;
         'content-type': 'application/json',
         'x-client-id': getClientId(),
       },
-      body: JSON.stringify({ slug: postSlug, action: 'comment', author, content }),
-    }).then(() => {
-      commentContent.value = '';
-      syncEngagement();
-    });
+      body: JSON.stringify({ slug: postSlug, action: 'comment', author, content, parentId: replyParentId.value }),
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || '发布失败');
+        }
+        commentContent.value = '';
+        clearReplying();
+        setStatus(data.pending ? '评论已提交，等待审核。' : '评论已发布。');
+        return syncEngagement();
+      })
+      .catch((error) => {
+        setStatus(error.message || '发布失败。', true);
+      })
+      .finally(() => {
+        if (commentSubmit) {
+          commentSubmit.disabled = false;
+          commentSubmit.textContent = '发布评论';
+        }
+      });
+  });
+
+  commentList?.addEventListener('click', (event) => {
+    const target = event.target as HTMLElement;
+    const replyButton = target.closest('.comment-reply') as HTMLButtonElement | null;
+    const button = target.closest('.comment-delete') as HTMLButtonElement | null;
+
+    if (replyButton && replyParentId && replyingBanner && replyingText && commentContent && commentSubmit) {
+      replyParentId.value = replyButton.dataset.commentId || '';
+      replyingText.textContent = `正在回复 ${replyButton.dataset.commentAuthor || '这条评论'}`;
+      replyingBanner.style.display = 'flex';
+      commentSubmit.textContent = '发布回复';
+      commentContent.focus();
+      setStatus('');
+      return;
+    }
+
+    if (!button || !postSlug) return;
+
+    setStatus('正在删除...');
+    fetch('/.netlify/functions/engagement', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-client-id': getClientId(),
+      },
+      body: JSON.stringify({ slug: postSlug, action: 'delete-comment', commentId: button.dataset.commentId }),
+    })
+      .then(async (response) => {
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok) {
+          throw new Error(data.error || '删除失败');
+        }
+        setStatus('评论已删除。');
+        return syncEngagement();
+      })
+      .catch((error) => {
+        setStatus(error.message || '删除失败。', true);
+      });
   });
 
   syncEngagement();
@@ -674,6 +828,18 @@ const postTitle = post.data.title;
     gap: 0.8rem;
   }
 
+  .replying-banner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.8rem 1rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    color: var(--text-secondary);
+  }
+
   .comment-form input,
   .comment-form textarea {
     width: 100%;
@@ -710,10 +876,36 @@ const postTitle = post.data.title;
     cursor: pointer;
   }
 
+  .reply-cancel,
+  .comment-reply {
+    border: none;
+    background: transparent;
+    color: var(--accent-soft);
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .reply-cancel:hover,
+  .comment-reply:hover {
+    color: #ffe0b0;
+  }
+
   .comment-list {
     display: grid;
     gap: 0.9rem;
     margin-top: 1.2rem;
+  }
+
+  .comment-status {
+    min-height: 1.5rem;
+    margin-top: 0.8rem;
+    color: var(--accent-cool);
+    font-size: 0.92rem;
+  }
+
+  .comment-status.is-error {
+    color: #ff9bc2;
   }
 
   .comment-item {
@@ -726,16 +918,55 @@ const postTitle = post.data.title;
   .comment-item-head {
     display: flex;
     justify-content: space-between;
+    align-items: start;
     gap: 1rem;
     margin-bottom: 0.6rem;
     color: var(--text-secondary);
     font-size: 0.9rem;
   }
 
+  .comment-author-row {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .comment-actions {
+    display: flex;
+    align-items: center;
+    gap: 0.9rem;
+  }
+
+  .comment-delete {
+    border: none;
+    background: transparent;
+    color: var(--text-muted);
+    font: inherit;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .comment-delete:hover {
+    color: #ff9bc2;
+  }
+
   .comment-item p,
   .comment-empty {
     color: var(--text-secondary);
     line-height: 1.8;
+  }
+
+  .reply-list {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.95rem;
+    padding-left: 1rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .reply-item {
+    padding: 0.9rem 1rem;
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.03);
   }
 
   .comment-empty {
