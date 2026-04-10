@@ -1,8 +1,8 @@
 ---
-import Base from '../../layouts/Base.astro';
+import Base from '../layouts/Base.astro';
 import { getCollection } from 'astro:content';
 
-const posts = (await getCollection('blog')).sort((a, b) => b.data.date.localeCompare(a.data.date));
+const posts = (await getCollection('blog')).sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
 ---
 
 <Base title="FireworksLife">
@@ -19,8 +19,8 @@ const posts = (await getCollection('blog')).sort((a, b) => b.data.date.localeCom
       {posts.map((post) => (
         <a href={`/blog/${post.id}`} class="card">
           <h3>{post.data.title}</h3>
-          <time>{post.data.date}</time>
-          <p>{post.data.excerpt || ''}</p>
+          <time>{post.data.pubDate.toLocaleDateString('zh-CN')}</time>
+          <p>{post.data.description || ''}</p>
         </a>
       ))}
     </div>
