@@ -1,5 +1,5 @@
 {
-  "name": "fireworkslife-frontend",
+  "name": "yufu-frontend",
   "type": "module",
   "version": "0.0.1",
   "scripts": {
@@ -10,6 +10,7 @@
   "dependencies": {
     "@astrojs/mdx": "^5.0.3",
     "@astrojs/sitemap": "^3.7.2",
+    "@netlify/blobs": "^8.1.0",
     "astro": "^6.1.5",
     "motion": "^12.38.0"
   }

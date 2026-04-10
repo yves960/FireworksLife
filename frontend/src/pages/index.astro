@@ -11,13 +11,13 @@ const totalPosts = sortedPosts.length;
 const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new Date().getFullYear();
 ---
 
-<Base title="FireworksLife · 更炫一点的个人博客">
+<Base title="鱼腹 · 更炫一点的个人博客">
   <section class="hero">
     <div class="hero-copy reveal" style="--reveal-delay: 0">
       <p class="eyebrow">Personal Blog / Design Playground</p>
-      <h1>把日常、代码和灵感，做成一场有烟火感的展演。</h1>
+      <h1>把日常、代码和灵感，收进鱼腹里慢慢发光。</h1>
       <p class="hero-text">
-        FireworksLife 记录技术拆解、工具实践和一些没必要藏起来的生活观察。不是文档仓库，
+        鱼腹记录技术拆解、工具实践和一些没必要藏起来的生活观察。不是文档仓库，
         更像一个有情绪、有节奏的个人频道。
       </p>
 
@@ -108,6 +108,17 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     </div>
   </section>
 
+  <section class="favorites-shell reveal" id="favoritesShell" style="display: none; --reveal-delay: 1;">
+    <div class="controls-header">
+      <div>
+        <p class="section-kicker">Saved Signals</p>
+        <h2>我的收藏</h2>
+      </div>
+      <p class="section-note">这里会显示你在当前浏览器里收藏过的文章。</p>
+    </div>
+    <div class="favorites-grid" id="favoritesGrid"></div>
+  </section>
+
   <section class="posts-grid" id="postsGrid">
     {sortedPosts.map((post, index) => (
       <a
@@ -160,10 +171,22 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
   const cards = document.querySelectorAll('.post-card');
   const noResults = document.getElementById('noResults');
   const subTagTabsContainer = document.getElementById('subTagTabs');
+  const favoritesShell = document.getElementById('favoritesShell');
+  const favoritesGrid = document.getElementById('favoritesGrid');
 
   let currentCategory = '全部';
   let currentTag = '';
   let searchText = '';
+
+  const clientIdKey = 'yufu:client-id';
+  const getClientId = () => {
+    let current = localStorage.getItem(clientIdKey);
+    if (!current) {
+      current = crypto.randomUUID();
+      localStorage.setItem(clientIdKey, current);
+    }
+    return current;
+  };
 
   const normalize = (value: string) => value.trim().toLowerCase();
 
@@ -199,6 +222,43 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     if (subTagTabsContainer) {
       subTagTabsContainer.style.opacity = currentCategory === '全部' ? '1' : '0.88';
     }
+  }
+
+  function renderFavorites() {
+    if (!favoritesShell || !favoritesGrid) return;
+
+    fetch(`/.netlify/functions/engagement?view=favorites`, {
+      headers: {
+        'x-client-id': getClientId(),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        const favorites = Array.isArray(data.favorites) ? data.favorites : [];
+
+        if (!favorites.length) {
+          favoritesShell.style.display = 'none';
+          favoritesGrid.innerHTML = '';
+          return;
+        }
+
+        favoritesShell.style.display = 'block';
+        favoritesGrid.innerHTML = favorites
+          .slice()
+          .reverse()
+          .map((item) => `
+            <a class="favorite-card" href="/blog/${item.slug}">
+              <span class="favorite-label">已收藏</span>
+              <strong>${item.title}</strong>
+              <span class="favorite-link">继续阅读</span>
+            </a>
+          `)
+          .join('');
+      })
+      .catch(() => {
+        favoritesShell.style.display = 'none';
+        favoritesGrid.innerHTML = '';
+      });
   }
 
   categoryTabs.forEach((tab, index) => {
@@ -240,6 +300,8 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     searchText = normalize((event.target as HTMLInputElement).value);
     filterCards();
   });
+
+  renderFavorites();
 </script>
 
 <style>
@@ -597,6 +659,55 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     margin-top: 2rem;
     padding: 1.5rem;
     border-radius: var(--radius-lg);
+  }
+
+  .favorites-shell {
+    margin-top: 1.25rem;
+    padding: 1.5rem;
+    border-radius: var(--radius-lg);
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, rgba(9, 17, 31, 0.78), rgba(12, 24, 43, 0.72));
+    backdrop-filter: blur(16px);
+    box-shadow: 0 16px 60px rgba(0, 0, 0, 0.18);
+  }
+
+  .favorites-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 1rem;
+  }
+
+  .favorite-card {
+    display: grid;
+    gap: 0.75rem;
+    padding: 1.2rem;
+    border-radius: 22px;
+    text-decoration: none;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: rgba(255, 255, 255, 0.04);
+    transition:
+      transform 0.25s ease,
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .favorite-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(255, 179, 71, 0.35);
+    box-shadow: 0 24px 60px rgba(0, 0, 0, 0.16);
+  }
+
+  .favorite-label,
+  .favorite-link {
+    color: var(--accent-soft);
+    font-size: 0.8rem;
+    text-transform: uppercase;
+    letter-spacing: 0.16em;
+  }
+
+  .favorite-card strong {
+    font-size: 1.1rem;
+    line-height: 1.5;
   }
 
   .controls-header {

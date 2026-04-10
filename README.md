@@ -1,254 +1,60 @@
-# Web 博客系统
+# 鱼腹
 
-一个简洁、快速的Web博客系统，支持Markdown内容、评论、点赞、多种登录方式（用户名/邮箱/GitHub OAuth）。
+一个基于 `Astro + Netlify` 的个人博客，当前支持：
+
+- Markdown / MDX 写作
+- Netlify Functions + Blobs 驱动的评论、点赞、收藏
+- 高视觉强度的首页、文章页和吉祥物交互
 
 ## 技术栈
 
-### 后端
-- **FastAPI** - 现代化的Python Web框架
-- **SQLAlchemy** - ORM数据库操作
-- **SQLite** - 轻量级数据库（支持WAL模式）
-- **Pydantic** - 数据验证和序列化
-- **JWT** - 认证授权
-- **Passlib** - 密码哈希
+- `Astro`
+- `@astrojs/mdx`
+- `Netlify Functions`
+- `@netlify/blobs`
 
-### 前端
-- **Vue 3** - 渐进式JavaScript框架
-- **Vite** - 快速的前端构建工具
-- **Vue Router** - 路由管理
-- **Pinia** - 状态管理
-- **Axios** - HTTP客户端
+## 本地开发
 
-## 功能特性
-
-### 已实现
-- ✅ 用户注册和登录（用户名/邮箱）
-- ✅ GitHub OAuth 登录
-- ✅ JWT认证和权限验证
-- ✅ "记住我"功能
-- ✅ 文章CRUD操作
-- ✅ 文章列表和分页
-- ✅ 评论系统（支持嵌套回复）
-- ✅ 点赞功能
-- ✅ 文章分类
-- ✅ Markdown渲染
-- ✅ 深色模式
-- ✅ 管理后台
-- ✅ 数据库备份
-
-### 计划中
-- ⏳ 邮箱验证
-- ⏳ 微信OAuth登录
-- ⏳ 炫酷视觉效果（粒子动画等）
-
-## GitHub OAuth 登录配置
-
-### 1. 创建 GitHub OAuth App
-
-1. 登录 GitHub，进入 **Settings** > **Developer settings** > **OAuth Apps** > **New OAuth App**
-2. 填写以下信息：
-   - **Application name**: FireworksLife（或你的应用名）
-   - **Homepage URL**: `http://localhost:3000`（开发环境）或你的生产域名
-   - **Authorization callback URL**: `http://localhost:3000/auth/github/callback`
-3. 创建后，复制 **Client ID**
-4. 点击 **Generate a new client secret**，复制 **Client Secret**
-
-### 2. 配置环境变量
-
-在 `backend/.env` 文件中添加以下配置：
-
-```bash
-GITHUB_CLIENT_ID=你的_client_id
-GITHUB_CLIENT_SECRET=你的_client_secret
-GITHUB_REDIRECT_URI=http://localhost:3000/auth/github/callback
-```
-
-### 3. 运行数据库迁移
-
-```bash
-cd backend
-source .venv/bin/activate
-python -m app.db.migrate_add_github
-```
-
-### 4. 重启服务
-
-重启后端服务后，登录页面将显示 "GitHub 登录" 按钮。
-
-## Python版本要求
-
-**推荐版本**: Python 3.11 或 3.12
-
-**注意**: Python 3.14 非常新，可能存在兼容性问题。详见 [backend/PYTHON_VERSION.md](backend/PYTHON_VERSION.md)
-
-## 快速开始
-
-### 后端
-
-**方法1: 使用安装脚本（推荐）**
-```bash
-cd backend
-./install.sh
-```
-
-**方法2: 手动安装**
-```bash
-cd backend
-
-# 创建虚拟环境
-python3.11 -m venv .venv  # 或 python3.12
-
-# 激活虚拟环境
-source .env/bin/activate  # Linux/Mac
-# 或
-.venv\Scripts\activate  # Windows
-
-# 安装依赖
-pip install -r requirements.txt
-
-# 配置环境变量
-cp .env.example .env
-# 编辑.env文件，配置必要的参数
-
-# 初始化数据库
-python -m app.db.init_db
-
-# 运行开发服务器
-python run.py
-```
-
-后端API将在 http://localhost:8000 运行
-
-**Docker方式（无需Python版本问题）**
-```bash
-docker-compose up -d
-```
-
-详见 [backend/INSTALL.md](backend/INSTALL.md)
-
-### 前端
-
-1. 安装依赖：
 ```bash
 cd frontend
 npm install
-```
-
-2. 配置环境变量：
-```bash
-cp .env.example .env
-# 编辑.env文件，配置API地址
-```
-
-3. 运行开发服务器：
-```bash
 npm run dev
 ```
 
-前端应用将在 http://localhost:3000 运行
+默认开发地址：
 
-### 使用Docker
+- 前端：`http://localhost:4321`
 
-1. 构建并启动所有服务：
+## 构建
+
 ```bash
-docker-compose up -d
+cd frontend
+npm run build
 ```
 
-2. 查看日志：
-```bash
-docker-compose logs -f
-```
+## 部署
 
-3. 停止服务：
-```bash
-docker-compose down
-```
+仓库根目录已经配置了 `netlify.toml`，Netlify 会：
 
-## API文档
+- 构建 `frontend`
+- 发布 `frontend/dist`
+- 使用 `frontend/netlify/functions` 作为函数目录
 
-启动后端服务后，访问以下地址查看自动生成的API文档：
-- Swagger UI: http://localhost:8000/docs
-- ReDoc: http://localhost:8000/redoc
-
-## 数据库备份
-
-手动备份数据库：
-```bash
-cd backend
-python -m app.db.backup
-```
-
-建议设置定期备份（如使用cron job）。
+评论、点赞、收藏依赖 Netlify 平台运行时提供的 Functions / Blobs 环境。
 
 ## 项目结构
 
-```
+```text
 .
-├── backend/              # 后端代码
-│   ├── app/
-│   │   ├── api/        # API路由
-│   │   ├── models/     # 数据库模型
-│   │   ├── schemas/    # Pydantic模型
-│   │   ├── core/       # 核心配置
-│   │   └── db/         # 数据库配置
-│   ├── requirements.txt
-│   └── run.py
-├── frontend/            # 前端代码
+├── frontend/
+│   ├── netlify/functions/   # Netlify Functions
+│   ├── public/
 │   ├── src/
-│   │   ├── components/ # Vue组件
-│   │   ├── views/      # 页面组件
-│   │   ├── router/     # 路由配置
-│   │   ├── store/      # 状态管理
-│   │   └── api/        # API调用
-│   ├── package.json
-│   └── vite.config.js
-└── docker-compose.yml   # Docker配置
+│   │   ├── content/blog/    # 博客文章
+│   │   ├── layouts/
+│   │   └── pages/
+│   ├── astro.config.mjs
+│   └── package.json
+├── netlify.toml
+└── README.md
 ```
-
-## 故障排除
-
-### 后端安装失败
-
-**Python版本问题**
-- 推荐使用Python 3.11或3.12
-- Python 3.14可能不兼容，详见 [backend/PYTHON_VERSION.md](backend/PYTHON_VERSION.md)
-
-**pip安装错误**
-```bash
-# 升级pip
-pip install --upgrade pip setuptools wheel
-
-# 清除缓存重新安装
-pip cache purge
-pip install -r requirements.txt --no-cache-dir
-```
-
-### 依赖编译错误
-
-**Ubuntu/Debian**
-```bash
-sudo apt-get install python3-dev build-essential
-```
-
-**macOS**
-```bash
-xcode-select --install
-```
-
-### 数据库问题
-
-如果遇到SQLite WAL模式错误，确保SQLite版本 >= 3.7.0
-
-```bash
-# 检查SQLite版本
-python -c "import sqlite3; print(sqlite3.sqlite_version)"
-```
-
-## 更多帮助
-
-- [backend/INSTALL.md](backend/INSTALL.md) - 详细安装说明
-- [backend/PYTHON_VERSION.md](backend/PYTHON_VERSION.md) - Python版本兼容性
-
-## 许可证
-
-MIT License

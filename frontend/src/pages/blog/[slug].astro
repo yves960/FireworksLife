@@ -13,6 +13,8 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 0) / 220));
+const postSlug = post.id;
+const postTitle = post.data.title;
 ---
 
 <Base title={post.data.title} description={post.data.description}>
@@ -35,6 +37,17 @@ const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 
             <div class="meta-tags">
               {(post.data.tags || []).map((tag) => <span>{tag}</span>)}
             </div>
+          </div>
+
+          <div class="engagement-bar" data-post-slug={postSlug} data-post-title={postTitle}>
+            <button type="button" class="engage-button" id="likeButton">
+              <span>点赞</span>
+              <strong id="likeCount">0</strong>
+            </button>
+            <button type="button" class="engage-button" id="favoriteButton">
+              <span>收藏</span>
+              <strong id="favoriteState">未收藏</strong>
+            </button>
           </div>
         </div>
 
@@ -78,11 +91,154 @@ const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 
       </aside>
     </div>
 
-    <div class="post-end reveal" style="--reveal-delay: 3">
+    <section class="comments-shell reveal" style="--reveal-delay: 3" data-post-slug={postSlug} data-post-title={postTitle}>
+      <div class="comments-head">
+        <div>
+          <p class="quote-kicker">Comments</p>
+          <h2>留言板</h2>
+        </div>
+        <p class="comments-note">评论、点赞和收藏会通过 Netlify Functions 存储，不再只是留在本地浏览器。</p>
+      </div>
+
+      <form class="comment-form" id="commentForm">
+        <input id="commentAuthor" type="text" maxlength="24" placeholder="你的名字" />
+        <textarea id="commentContent" rows="4" maxlength="300" placeholder="写点想法、反馈或者吐槽"></textarea>
+        <button type="submit" class="comment-submit">发布评论</button>
+      </form>
+
+      <div class="comment-list" id="commentList"></div>
+      <p class="comment-empty" id="commentEmpty">还没有评论，来留下第一条。</p>
+    </section>
+
+    <div class="post-end reveal" style="--reveal-delay: 4">
       <a href="/" class="back-link">继续逛首页</a>
     </div>
   </article>
 </Base>
+
+<script>
+  const engagementBar = document.querySelector('.engagement-bar') as HTMLElement | null;
+  const commentsShell = document.querySelector('.comments-shell') as HTMLElement | null;
+  const likeButton = document.getElementById('likeButton') as HTMLButtonElement | null;
+  const favoriteButton = document.getElementById('favoriteButton') as HTMLButtonElement | null;
+  const likeCount = document.getElementById('likeCount');
+  const favoriteState = document.getElementById('favoriteState');
+  const commentForm = document.getElementById('commentForm') as HTMLFormElement | null;
+  const commentAuthor = document.getElementById('commentAuthor') as HTMLInputElement | null;
+  const commentContent = document.getElementById('commentContent') as HTMLTextAreaElement | null;
+  const commentList = document.getElementById('commentList');
+  const commentEmpty = document.getElementById('commentEmpty');
+
+  const postSlug = engagementBar?.dataset.postSlug || commentsShell?.dataset.postSlug || '';
+  const postTitle = engagementBar?.dataset.postTitle || commentsShell?.dataset.postTitle || '';
+
+  const clientIdKey = 'yufu:client-id';
+  const getClientId = () => {
+    let current = localStorage.getItem(clientIdKey);
+    if (!current) {
+      current = crypto.randomUUID();
+      localStorage.setItem(clientIdKey, current);
+    }
+    return current;
+  };
+
+  const renderComments = (items: Array<{ author: string; content: string; createdAt: string }>) => {
+    if (!commentList || !commentEmpty) return;
+
+    commentList.innerHTML = items
+      .slice()
+      .reverse()
+      .map((item) => `
+        <article class="comment-item">
+          <div class="comment-item-head">
+            <strong>${item.author}</strong>
+            <time>${new Date(item.createdAt).toLocaleString('zh-CN')}</time>
+          </div>
+          <p>${item.content}</p>
+        </article>
+      `)
+      .join('');
+
+    commentEmpty.style.display = items.length ? 'none' : 'block';
+  };
+
+  const syncEngagement = () => {
+    if (!postSlug) return Promise.resolve();
+
+    return fetch(`/.netlify/functions/engagement?slug=${encodeURIComponent(postSlug)}`, {
+      headers: {
+        'x-client-id': getClientId(),
+      },
+    })
+      .then((response) => response.json())
+      .then((data) => {
+        if (likeCount) {
+          likeCount.textContent = String(data.likesCount || 0);
+        }
+
+        if (favoriteState) {
+          favoriteState.textContent = data.favorited ? '已收藏' : '未收藏';
+        }
+
+        likeButton?.classList.toggle('is-active', Boolean(data.liked));
+        favoriteButton?.classList.toggle('is-active', Boolean(data.favorited));
+        renderComments(Array.isArray(data.comments) ? data.comments : []);
+      })
+      .catch(() => {
+        if (commentEmpty) {
+          commentEmpty.textContent = '互动服务暂时不可用。';
+          commentEmpty.style.display = 'block';
+        }
+      });
+  };
+
+  likeButton?.addEventListener('click', () => {
+    if (!postSlug) return;
+    fetch('/.netlify/functions/engagement', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-client-id': getClientId(),
+      },
+      body: JSON.stringify({ slug: postSlug, action: 'like' }),
+    }).then(() => syncEngagement());
+  });
+
+  favoriteButton?.addEventListener('click', () => {
+    if (!postSlug) return;
+    fetch('/.netlify/functions/engagement', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-client-id': getClientId(),
+      },
+      body: JSON.stringify({ slug: postSlug, title: postTitle, action: 'favorite' }),
+    }).then(() => syncEngagement());
+  });
+
+  commentForm?.addEventListener('submit', (event) => {
+    event.preventDefault();
+    if (!postSlug || !commentAuthor || !commentContent) return;
+
+    const author = commentAuthor.value.trim() || '匿名';
+    const content = commentContent.value.trim();
+    if (!content) return;
+
+    fetch('/.netlify/functions/engagement', {
+      method: 'POST',
+      headers: {
+        'content-type': 'application/json',
+        'x-client-id': getClientId(),
+      },
+      body: JSON.stringify({ slug: postSlug, action: 'comment', author, content }),
+    }).then(() => {
+      commentContent.value = '';
+      syncEngagement();
+    });
+  });
+
+  syncEngagement();
+</script>
 
 <style>
   .blog-post {
@@ -192,6 +348,46 @@ const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 
     align-items: center;
     margin-top: 1.6rem;
     color: var(--text-muted);
+  }
+
+  .engagement-bar {
+    display: flex;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    margin-top: 1.2rem;
+  }
+
+  .engage-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.6rem;
+    min-height: 3rem;
+    padding: 0.7rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font: inherit;
+    cursor: pointer;
+    transition:
+      transform 0.25s ease,
+      border-color 0.25s ease,
+      background 0.25s ease;
+  }
+
+  .engage-button:hover {
+    transform: translateY(-2px);
+    border-color: rgba(255, 179, 71, 0.35);
+  }
+
+  .engage-button strong {
+    color: var(--accent-soft);
+    font-size: 0.86rem;
+  }
+
+  .engage-button.is-active {
+    background: linear-gradient(135deg, rgba(255, 122, 24, 0.18), rgba(94, 234, 212, 0.12));
+    border-color: rgba(255, 179, 71, 0.36);
   }
 
   .meta-tags {
@@ -445,6 +641,107 @@ const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 
     line-height: 1.75;
   }
 
+  .comments-shell {
+    margin-top: 1.5rem;
+    padding: clamp(1.4rem, 4vw, 2rem);
+    border-radius: 28px;
+    border: 1px solid rgba(255, 255, 255, 0.09);
+    background: linear-gradient(180deg, rgba(9, 17, 31, 0.78), rgba(12, 24, 43, 0.72));
+    backdrop-filter: blur(16px);
+    box-shadow: 0 18px 60px rgba(0, 0, 0, 0.18);
+  }
+
+  .comments-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: end;
+    margin-bottom: 1rem;
+  }
+
+  .comments-head h2 {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+  }
+
+  .comments-note {
+    max-width: 32rem;
+    color: var(--text-secondary);
+    line-height: 1.7;
+  }
+
+  .comment-form {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .comment-form input,
+  .comment-form textarea {
+    width: 100%;
+    border-radius: 18px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.04);
+    color: var(--text-primary);
+    font: inherit;
+    padding: 0.9rem 1rem;
+  }
+
+  .comment-form textarea {
+    resize: vertical;
+    min-height: 7rem;
+  }
+
+  .comment-form input:focus,
+  .comment-form textarea:focus {
+    outline: none;
+    border-color: rgba(255, 179, 71, 0.55);
+    box-shadow: 0 0 0 5px rgba(255, 122, 24, 0.12);
+  }
+
+  .comment-submit {
+    justify-self: start;
+    min-height: 3rem;
+    padding: 0.8rem 1.1rem;
+    border-radius: 999px;
+    border: none;
+    background: linear-gradient(135deg, var(--accent), var(--accent-soft));
+    color: #08111f;
+    font: inherit;
+    font-weight: 700;
+    cursor: pointer;
+  }
+
+  .comment-list {
+    display: grid;
+    gap: 0.9rem;
+    margin-top: 1.2rem;
+  }
+
+  .comment-item {
+    padding: 1rem 1rem 1.05rem;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.04);
+  }
+
+  .comment-item-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    margin-bottom: 0.6rem;
+    color: var(--text-secondary);
+    font-size: 0.9rem;
+  }
+
+  .comment-item p,
+  .comment-empty {
+    color: var(--text-secondary);
+    line-height: 1.8;
+  }
+
+  .comment-empty {
+    margin-top: 1rem;
+  }
+
   .post-end {
     margin-top: 1.5rem;
   }
@@ -460,6 +757,11 @@ const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 
 
     .quote-panel {
       display: none;
+    }
+
+    .comments-head {
+      flex-direction: column;
+      align-items: start;
     }
   }
 
@@ -479,7 +781,8 @@ const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 
 
   @media (max-width: 720px) {
     .post-hero,
-    .content-shell {
+    .content-shell,
+    .comments-shell {
       border-radius: 22px;
     }
 

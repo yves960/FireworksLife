@@ -4,7 +4,7 @@ interface Props {
   description?: string;
 }
 
-const { title, description = "FireworksLife - 一个更有舞台感的个人博客" } = Astro.props;
+const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } = Astro.props;
 ---
 
 <!DOCTYPE html>
@@ -32,23 +32,33 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
 
     <div class="cursor-glow" id="cursorGlow" aria-hidden="true"></div>
 
-    <div class="pet-sprite" id="petSprite" aria-hidden="true">
+    <div class="pet-sprite" id="petSprite" aria-hidden="true" data-mood="idle" data-state="active">
+      <span class="pet-aura"></span>
       <span class="pet-trail"></span>
+      <span class="pet-tail"></span>
       <span class="pet-core">
         <span class="pet-halo"></span>
+        <span class="pet-ears"></span>
         <span class="pet-wings"></span>
+        <span class="pet-cheeks"></span>
+        <span class="pet-sigil">FL</span>
         <span class="pet-face">
           <span class="pet-eye"></span>
           <span class="pet-eye"></span>
+          <span class="pet-mouth"></span>
         </span>
       </span>
+      <span class="pet-spark spark-a"></span>
+      <span class="pet-spark spark-b"></span>
+      <span class="pet-spark spark-c"></span>
+      <span class="pet-bubble" id="petBubble">Hi</span>
     </div>
 
     <nav class="site-nav">
       <div class="nav-content">
         <a href="/" class="logo">
           <span class="logo-mark">FL</span>
-          <span class="logo-text">FireworksLife</span>
+          <span class="logo-text">鱼腹</span>
         </a>
         <div class="nav-links">
           <a href="/">首页</a>
@@ -62,7 +72,7 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
     </main>
 
     <footer>
-      <p>© 2026 FireworksLife · Notes, sparks, and signal.</p>
+      <p>© 2026 鱼腹 · Notes, sparks, and signal.</p>
     </footer>
 
     <style is:global>
@@ -205,13 +215,26 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         z-index: 12;
       }
 
+      .pet-aura,
       .pet-trail,
+      .pet-tail,
       .pet-core,
       .pet-halo,
+      .pet-ears,
       .pet-wings,
+      .pet-cheeks,
+      .pet-sigil,
       .pet-face {
         position: absolute;
         inset: 0;
+      }
+
+      .pet-aura {
+        inset: -0.35rem;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(94, 234, 212, 0.18), rgba(255, 122, 24, 0.08) 44%, transparent 72%);
+        filter: blur(20px);
+        animation: aura-shift 3.8s ease-in-out infinite;
       }
 
       .pet-trail {
@@ -220,6 +243,18 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         background: radial-gradient(circle, rgba(255, 122, 24, 0.32), rgba(255, 95, 158, 0.18) 45%, transparent 72%);
         filter: blur(14px);
         animation: pulse-trail 2.2s ease-in-out infinite;
+      }
+
+      .pet-tail {
+        inset: auto 0.55rem 0.3rem auto;
+        width: 1.55rem;
+        height: 1.55rem;
+        border-radius: 0.2rem 999px 999px 999px;
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 122, 24, 0.85) 45%, rgba(255, 95, 158, 0.88));
+        transform: rotate(-36deg);
+        filter: blur(0.35px);
+        box-shadow: 0 0 18px rgba(255, 122, 24, 0.28);
+        animation: tail-swish 1.8s ease-in-out infinite;
       }
 
       .pet-core {
@@ -232,6 +267,19 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
           0 0 26px rgba(255, 122, 24, 0.3),
           0 0 46px rgba(94, 234, 212, 0.14);
         animation: pet-bob 2.4s ease-in-out infinite;
+      }
+
+      .pet-sigil {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        inset: 1.55rem 1.3rem auto 1.3rem;
+        height: 0.72rem;
+        font-size: 0.5rem;
+        font-weight: 700;
+        letter-spacing: 0.12em;
+        color: rgba(8, 17, 31, 0.72);
+        text-shadow: 0 0 8px rgba(255, 244, 223, 0.24);
       }
 
       .pet-halo {
@@ -287,6 +335,48 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         animation: flap-right 0.95s ease-in-out infinite;
       }
 
+      .pet-ears::before,
+      .pet-ears::after {
+        content: "";
+        position: absolute;
+        top: 0.18rem;
+        width: 1rem;
+        height: 1.15rem;
+        background: linear-gradient(180deg, rgba(255, 244, 223, 0.95), rgba(255, 185, 118, 0.68));
+        clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+        filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.18));
+      }
+
+      .pet-ears::before {
+        left: 1rem;
+        transform: rotate(-10deg);
+      }
+
+      .pet-ears::after {
+        right: 1rem;
+        transform: rotate(10deg);
+      }
+
+      .pet-cheeks::before,
+      .pet-cheeks::after {
+        content: "";
+        position: absolute;
+        top: 2rem;
+        width: 0.42rem;
+        height: 0.22rem;
+        border-radius: 999px;
+        background: rgba(255, 244, 223, 0.55);
+        filter: blur(1px);
+      }
+
+      .pet-cheeks::before {
+        left: 1.35rem;
+      }
+
+      .pet-cheeks::after {
+        right: 1.35rem;
+      }
+
       .pet-face {
         display: flex;
         align-items: center;
@@ -301,6 +391,110 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         background: #08111f;
         border-radius: 999px;
         animation: blink 4.8s ease-in-out infinite;
+      }
+
+      .pet-mouth {
+        position: absolute;
+        left: 50%;
+        top: 2.12rem;
+        width: 0.58rem;
+        height: 0.34rem;
+        border-bottom: 2px solid #08111f;
+        border-radius: 0 0 999px 999px;
+        transform: translateX(-50%);
+      }
+
+      .pet-spark {
+        position: absolute;
+        width: 0.36rem;
+        height: 0.36rem;
+        border-radius: 999px;
+        background: rgba(255, 244, 223, 0.95);
+        box-shadow: 0 0 12px rgba(255, 255, 255, 0.36);
+      }
+
+      .spark-a {
+        top: 0.35rem;
+        right: 0.4rem;
+        animation: spark-float 1.9s ease-in-out infinite;
+      }
+
+      .spark-b {
+        bottom: 0.7rem;
+        left: 0.25rem;
+        width: 0.28rem;
+        height: 0.28rem;
+        animation: spark-float 2.3s ease-in-out infinite reverse;
+      }
+
+      .spark-c {
+        top: 1.1rem;
+        left: -0.15rem;
+        width: 0.24rem;
+        height: 0.24rem;
+        animation: spark-float 2.1s ease-in-out infinite;
+      }
+
+      .pet-bubble {
+        position: absolute;
+        left: 50%;
+        top: -1.65rem;
+        transform: translateX(-50%) scale(0.9);
+        padding: 0.32rem 0.55rem;
+        border-radius: 999px;
+        background: rgba(7, 17, 31, 0.88);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        color: #fff3dc;
+        font-size: 0.72rem;
+        line-height: 1;
+        white-space: nowrap;
+        opacity: 0;
+        transition:
+          opacity 0.25s ease,
+          transform 0.25s ease;
+      }
+
+      .pet-bubble.is-visible {
+        opacity: 1;
+        transform: translateX(-50%) scale(1);
+      }
+
+      .pet-sprite[data-mood="hover"] .pet-core {
+        animation-duration: 1.3s;
+      }
+
+      .pet-sprite[data-mood="hover"] .pet-mouth {
+        width: 0.72rem;
+      }
+
+      .pet-sprite[data-mood="excited"] .pet-core {
+        transform: scale(1.08);
+      }
+
+      .pet-sprite[data-mood="excited"] .pet-aura {
+        opacity: 1;
+      }
+
+      .pet-sprite[data-mood="excited"] .pet-spark {
+        background: rgba(94, 234, 212, 0.95);
+      }
+
+      .pet-sprite[data-state="docked"] .pet-aura {
+        opacity: 0.45;
+        transform: scale(0.82);
+      }
+
+      .pet-sprite[data-state="docked"] .pet-wings::before,
+      .pet-sprite[data-state="docked"] .pet-wings::after {
+        animation-duration: 2.1s;
+      }
+
+      .pet-sprite[data-state="docked"] .pet-tail {
+        animation-duration: 2.6s;
+      }
+
+      .pet-sprite[data-state="docked"] .pet-core {
+        animation-duration: 3.2s;
       }
 
       .site-nav {
@@ -450,6 +644,18 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         }
       }
 
+      @keyframes aura-shift {
+        0%,
+        100% {
+          transform: scale(0.92);
+          opacity: 0.62;
+        }
+        50% {
+          transform: scale(1.06);
+          opacity: 1;
+        }
+      }
+
       @keyframes pet-bob {
         0%,
         100% {
@@ -457,6 +663,16 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         }
         50% {
           transform: translateY(-0.25rem) rotate(4deg);
+        }
+      }
+
+      @keyframes tail-swish {
+        0%,
+        100% {
+          transform: rotate(-36deg) scale(1);
+        }
+        50% {
+          transform: rotate(-12deg) scale(1.06);
         }
       }
 
@@ -489,6 +705,18 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         }
         49% {
           transform: scaleY(0.2);
+        }
+      }
+
+      @keyframes spark-float {
+        0%,
+        100% {
+          transform: translateY(0) scale(0.85);
+          opacity: 0.5;
+        }
+        50% {
+          transform: translateY(-0.45rem) scale(1.1);
+          opacity: 1;
         }
       }
 
@@ -554,8 +782,10 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
       if (!prefersReducedMotion) {
         const cursorGlow = document.getElementById('cursorGlow');
         const petSprite = document.getElementById('petSprite');
+        const petBubble = document.getElementById('petBubble');
         const revealItems = document.querySelectorAll('.reveal');
         const spotlightCards = document.querySelectorAll('[data-spotlight]');
+        const interactiveTargets = document.querySelectorAll('a, button, input, textarea, summary');
 
         let mouseX = window.innerWidth * 0.75;
         let mouseY = window.innerHeight * 0.35;
@@ -563,6 +793,62 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         let glowY = mouseY;
         let petX = mouseX;
         let petY = mouseY;
+        let targetPetX = mouseX;
+        let targetPetY = mouseY;
+        let moodTimer;
+        let lastMoveAt = Date.now();
+        let isDocked = false;
+        let lastMouseClientX = mouseX;
+        let lastMouseClientY = mouseY;
+
+        const dockOffsetX = 120;
+        const dockOffsetY = 116;
+
+        const petMessages = {
+          idle: ['Flare', 'FL', 'Spark', '在线'],
+          hover: ['点这里', '看这个', 'Nice', 'Go'],
+          excited: ['Boom!', '亮了', 'Hit!', 'Shine'],
+          sleepy: ['停靠中', 'zzZ', 'drift', '休息']
+        };
+
+        function getDockPoint() {
+          return {
+            x: window.innerWidth - dockOffsetX,
+            y: window.innerHeight - dockOffsetY
+          };
+        }
+
+        function setDocked(nextDocked, message) {
+          if (!petSprite) return;
+          isDocked = nextDocked;
+          petSprite.dataset.state = nextDocked ? 'docked' : 'active';
+
+          if (nextDocked) {
+            const dock = getDockPoint();
+            targetPetX = dock.x;
+            targetPetY = dock.y;
+            setPetMood('sleepy', message || 'Flare');
+          } else {
+            targetPetX = mouseX;
+            targetPetY = mouseY;
+            setPetMood('idle', message || '起飞');
+          }
+        }
+
+        function setPetMood(mood, forceMessage) {
+          if (!petSprite) return;
+          petSprite.dataset.mood = mood;
+
+          if (!petBubble) return;
+          const pool = petMessages[mood] || petMessages.idle;
+          petBubble.textContent = forceMessage || pool[Math.floor(Math.random() * pool.length)];
+          petBubble.classList.add('is-visible');
+
+          window.clearTimeout(moodTimer);
+          moodTimer = window.setTimeout(() => {
+            petBubble.classList.remove('is-visible');
+          }, mood === 'excited' ? 1100 : 820);
+        }
 
         const revealObserver = new IntersectionObserver(
           (entries) => {
@@ -580,6 +866,38 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         document.addEventListener('mousemove', (event) => {
           mouseX = event.clientX;
           mouseY = event.clientY;
+          lastMoveAt = Date.now();
+          lastMouseClientX = event.clientX;
+          lastMouseClientY = event.clientY;
+
+          const dock = getDockPoint();
+          const nearDock = Math.hypot(event.clientX - dock.x, event.clientY - dock.y) < 180;
+
+          if (isDocked && nearDock) {
+            setDocked(false, 'Flare');
+          }
+
+          if (!isDocked && petSprite?.dataset.mood === 'sleepy') {
+            setPetMood('idle', 'back');
+          }
+        });
+
+        interactiveTargets.forEach((target) => {
+          target.addEventListener('pointerenter', () => {
+            setPetMood('hover');
+          });
+        });
+
+        document.addEventListener('click', () => {
+          setPetMood('excited');
+        });
+
+        window.addEventListener('resize', () => {
+          if (isDocked) {
+            const dock = getDockPoint();
+            targetPetX = dock.x;
+            targetPetY = dock.y;
+          }
         });
 
         spotlightCards.forEach((card) => {
@@ -602,8 +920,16 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
         function animate() {
           glowX += (mouseX - glowX) * 0.12;
           glowY += (mouseY - glowY) * 0.12;
-          petX += (mouseX - petX) * 0.08;
-          petY += (mouseY - petY) * 0.08;
+          if (!isDocked) {
+            targetPetX = mouseX;
+            targetPetY = mouseY;
+          }
+          petX += (targetPetX - petX) * (isDocked ? 0.045 : 0.08);
+          petY += (targetPetY - petY) * (isDocked ? 0.045 : 0.08);
+
+          if (Date.now() - lastMoveAt > 2600 && !isDocked) {
+            setDocked(true, 'Flare');
+          }
 
           if (cursorGlow) {
             cursorGlow.style.transform = `translate(${glowX - 144}px, ${glowY - 144}px)`;
@@ -611,6 +937,8 @@ const { title, description = "FireworksLife - 一个更有舞台感的个人博�
 
           if (petSprite) {
             petSprite.style.transform = `translate(${petX - 38}px, ${petY - 38}px)`;
+            const aimX = (isDocked ? lastMouseClientX : mouseX) - petX;
+            petSprite.style.rotate = `${aimX * 0.03}deg`;
           }
 
           requestAnimationFrame(animate);

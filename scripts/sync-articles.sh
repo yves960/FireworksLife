@@ -1,5 +1,5 @@
 #!/bin/bash
-# sync-articles.sh - 将 workspace-director/articles 同步到 FireworksLife 博客
+# sync-articles.sh - 将 workspace-director/articles 同步到鱼腹博客
 # 用法: ./scripts/sync-articles.sh
 
 ARTICLES_DIR="/Users/sy/.openclaw/workspace-director/articles"
