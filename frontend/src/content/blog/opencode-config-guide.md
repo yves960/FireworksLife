@@ -1,13 +1,11 @@
 ---
-
 title: "如何用 AI 代替我：第二章 - 我的 OpenCode 配置详解"
 description: "如何用 AI 代替我：第二章 - 我的 OpenCode 配置详解"
-pubDate: 2026-03-31
-category: "技术"
-subTag: "实践"
-tags: ["OpenCode", "AI", "配置"]
-
+pubDate: 2026-03-30
+category: "实践"
+tags: ["AI", "开发"]
 ---
+
 
 
 上一章讲了为什么我选择 CLI Agent。这一章，我来拆解我的 OpenCode 配置——每一个插件、每一个参数、每一个 Skill 都是怎么用的。

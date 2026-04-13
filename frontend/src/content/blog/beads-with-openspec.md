@@ -1,10 +1,11 @@
 ---
-title: "Beads和OpenSpec：为什么AI代理需要两套系统"
-description: "Beads和OpenSpec：为什么AI代理需要两套系统"
-pubDate: 
+title: "创建Epic"
+description: "创建Epic"
+pubDate: 2026-03-30
 category: "技术"
 tags: ["AI", "开发"]
 ---
+
 
 
 ## 一个我观察到的痛点
