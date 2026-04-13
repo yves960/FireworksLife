@@ -1,12 +1,9 @@
 ---
-
 title: "Harness Engineering：一个被忽视的真相"
 description: "Harness Engineering：一个被忽视的真相"
-pubDate: 2026-03-30
+pubDate: 
 category: "技术"
-subTag: "理论"
-tags: ["AI", "Harness", "Agent"]
-
+tags: ["AI", "开发"]
 ---
 
 

@@ -1,12 +1,9 @@
 ---
-
 title: "AI辅助研发工具地图"
 description: "AI辅助研发工具地图"
-pubDate: 2026-03-30
+pubDate: 
 category: "技术"
-subTag: "工具地图"
-tags: ["AI", "研发", "工具"]
-
+tags: ["AI", "开发"]
 ---
 
 
