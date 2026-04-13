@@ -5,18 +5,22 @@ on:
   repository_dispatch:
     types: [articles-updated]
 
-  # 也支持手动触发
+  # 支持手动触发
   workflow_dispatch:
 
 jobs:
-  sync-and-deploy:
+  sync:
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     
     steps:
-      - name: Checkout FireworksLife
+      - name: Checkout FireworksLife (content 分支)
         uses: actions/checkout@v4
         with:
+          ref: content
           token: ${{ secrets.GITHUB_TOKEN }}
+          fetch-depth: 0
 
       - name: Checkout Articles
         uses: actions/checkout@v4
@@ -26,21 +30,19 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           fetch-depth: 1
 
-      - name: Set up Bash
+      - name: Sync articles to content branch
         run: |
-          # 同步 articles 仓库的顶级 md 文件（排除子目录）
           mkdir -p frontend/src/content/blog
           
-          # 排除的目录
-          EXCLUDE_DIRS="ai-assisted-dev-specs ai-replacement-series"
-          
           count=0
+          updated=0
+          
           for file in articles-source/*.md; do
             [ -f "$file" ] || continue
             
             filename=$(basename "$file")
             
-            # 跳过 README
+            # 跳过非文章文件
             if [ "$filename" = "README.md" ]; then
               continue
             fi
@@ -51,12 +53,10 @@ jobs:
             # 提取日期（从文件名）
             date=$(echo "$filename" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 || echo "2026-03-30")
             
-            # 生成目标文件
             blog_file="frontend/src/content/blog/$filename"
             
-            # 判断是否需要更新（比较修改时间）
-            if [ ! -f "$blog_file" ] || [ "$(stat -c %Y "$file")" -gt "$(stat -c %Y "$blog_file")" ]; then
-              # 生成带 frontmatter 的文件
+            # 比较内容是否有变化
+            if [ ! -f "$blog_file" ] || ! diff -q "$file" "$blog_file" > /dev/null 2>&1; then
               {
                 echo "---"
                 echo "title: \"${title}\""
@@ -66,21 +66,20 @@ jobs:
                 echo "tags: [\"AI\", \"开发\"]"
                 echo "---"
                 echo ""
-                # 追加内容（去掉第一个 H1）
                 tail -n +2 "$file"
               } > "$blog_file"
-              
               echo "✅ 同步: $filename"
               count=$((count + 1))
+              updated=$((updated + 1))
             else
-              echo "⏭️  跳过（未变化）: $filename"
+              echo "⏭️  未变化: $filename"
             fi
           done
           
           echo ""
           echo "✨ 共同步 $count 篇文章"
 
-      - name: Commit & Push if changed
+      - name: Commit & Push to content branch
         run: |
           cd frontend
           git config user.name "github-actions[bot]"
@@ -90,7 +89,9 @@ jobs:
             echo "📭 没有新文章，跳过提交"
           else
             git add src/content/blog/
-            git commit -m "chore: sync new articles from yves960/articles"
-            git push
-            echo "🚀 已推送，等待 Netlify 部署..."
+            git commit -m "chore: sync new articles"
+            git push origin content
+            echo "✅ 已推送到 content 分支"
+            echo ""
+            echo "💡 如需发布，请在 FireworksLife 仓库手动触发 '构建部署' workflow"
           fi
