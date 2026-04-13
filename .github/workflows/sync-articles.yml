@@ -1,6 +1,9 @@
 name: Sync Articles
 
 on:
+  push:
+    branches:
+      - main
   repository_dispatch:
     types: [articles-updated]
   workflow_dispatch:
