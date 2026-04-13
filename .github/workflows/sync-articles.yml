@@ -1,13 +1,12 @@
 name: Sync Articles
 
 on:
-  push:
-    branches:
-      - main
   repository_dispatch:
     types: [articles-updated]
   workflow_dispatch:
 
+# 只在 articles 源文件变更时才触发 sync
+# Netlify 自动部署监听 main 分支更新，sync 后 push 才会触发
 jobs:
   sync:
     runs-on: ubuntu-latest
