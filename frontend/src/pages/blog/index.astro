@@ -1,0 +1,218 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+const posts = await getCollection('blog');
+const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
+const categories = ['全部', ...new Set(posts.map((p) => p.data.category))];
+const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
+---
+
+<Base title="全部文章 · 鱼腹">
+  <section class="blog-list-hero reveal" style="--reveal-delay: 0">
+    <a href="/" class="back-link">← 返回首页</a>
+    <p class="section-kicker">All Signals</p>
+    <h1>全部文章</h1>
+    <p class="blog-list-desc">共 {sortedPosts.length} 篇，按发布时间倒序排列。</p>
+  </section>
+
+  <section class="control-shell reveal" style="--reveal-delay: 1">
+    <div class="search-box">
+      <input type="text" id="searchInput" placeholder="搜索标题、关键词" />
+    </div>
+    <div class="category-tabs">
+      {categories.map((cat) => (
+        <button class="category-tab" data-category={cat}>{cat}</button>
+      ))}
+    </div>
+    <div class="subtag-tabs" id="subTagTabs">
+      <span class="subtag-label">过滤标签</span>
+      {allTags.slice(0, 10).map((tag) => (
+        <button class="subtag-tab" data-tag={tag}>{tag}</button>
+      ))}
+      {allTags.length > 10 && (
+        <button class="subtag-expand" id="subtagExpand" data-expanded="false">
+          全部 {allTags.length} 个标签 ▼
+        </button>
+      )}
+      <div class="subtag-extra" id="subtagExtra" style="display:none;">
+        {allTags.slice(10).map((tag) => (
+          <button class="subtag-tab" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="blog-list" id="blogList">
+    {sortedPosts.map((post) => (
+      <a
+        href={`/blog/${post.id}`}
+        class="blog-item reveal"
+        data-category={post.data.category}
+        data-tags={JSON.stringify(post.data.tags || [])}
+        data-title={post.data.title.toLowerCase()}
+        data-description={post.data.description.toLowerCase()}
+      >
+        <div class="blog-item-meta">
+          <span class="post-category">{post.data.category}</span>
+          <time>{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</time>
+        </div>
+        <h3>{post.data.title}</h3>
+        <p class="blog-item-desc">{post.data.description}</p>
+        <div class="post-tags">
+          {(post.data.tags || []).slice(0, 4).map((tag) => (
+            <span class="tag">{tag}</span>
+          ))}
+        </div>
+      </a>
+    ))}
+  </section>
+
+  <div class="no-results reveal" id="noResults" style="display: none;">
+    <p>没有找到匹配的文章，换个关键词或筛选条件试试。</p>
+  </div>
+</Base>
+
+<style>
+  .blog-list-hero {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 6rem 2rem 2rem;
+  }
+
+  .back-link {
+    color: var(--accent);
+    text-decoration: none;
+    font-size: 0.875rem;
+    opacity: 0.7;
+    transition: opacity 0.2s;
+  }
+  .back-link:hover { opacity: 1; }
+
+  .blog-list-hero h1 {
+    font-size: clamp(2rem, 5vw, 3rem);
+    margin: 0.5rem 0;
+  }
+
+  .blog-list-desc {
+    color: var(--muted);
+    font-size: 0.95rem;
+    margin: 0;
+  }
+
+  .blog-list {
+    max-width: 720px;
+    margin: 0 auto;
+    padding: 0 2rem 4rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+  }
+
+  .blog-item {
+    display: block;
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    text-decoration: none;
+    color: inherit;
+    transition: background 0.2s;
+  }
+  .blog-item:hover {
+    background: color-mix(in srgb, var(--accent) 4%, transparent);
+  }
+
+  .blog-item-meta {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    margin-bottom: 0.5rem;
+    font-size: 0.8rem;
+    color: var(--muted);
+  }
+  .blog-item-meta time {
+    font-variant-numeric: tabular-nums;
+  }
+
+  .blog-item h3 {
+    font-size: 1.25rem;
+    margin: 0 0 0.4rem;
+    line-height: 1.4;
+  }
+
+  .blog-item-desc {
+    color: var(--muted);
+    font-size: 0.9rem;
+    margin: 0 0 0.6rem;
+    line-height: 1.5;
+  }
+
+  .blog-item.hidden { display: none; }
+</style>
+
+<script>
+  const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+  const categoryTabs = document.querySelectorAll('.category-tab');
+  const subTagTabs = document.querySelectorAll('.subtag-tab');
+  const items = document.querySelectorAll('.blog-item');
+  const noResults = document.getElementById('noResults');
+  const subtagExpand = document.getElementById('subtagExpand');
+  const subtagExtra = document.getElementById('subtagExtra');
+
+  let currentCategory = '全部';
+  let currentTag = '';
+  let searchText = '';
+
+  function filterItems() {
+    let visible = 0;
+    items.forEach((item) => {
+      const el = item as HTMLElement;
+      const cat = el.dataset.category || '';
+      const tags = JSON.parse(el.dataset.tags || '[]');
+      const title = el.dataset.title || '';
+      const desc = el.dataset.description || '';
+      const matchCat = currentCategory === '全部' || cat === currentCategory;
+      const matchTag = !currentTag || tags.includes(currentTag);
+      const matchSearch = !searchText || title.includes(searchText) || desc.includes(searchText);
+      const show = matchCat && matchTag && matchSearch;
+      el.classList.toggle('hidden', !show);
+      if (show) visible++;
+    });
+    if (noResults) noResults.style.display = visible === 0 ? 'block' : 'none';
+  }
+
+  searchInput?.addEventListener('input', () => {
+    searchText = searchInput.value.toLowerCase();
+    filterItems();
+  });
+
+  categoryTabs.forEach((tab) => {
+    tab.addEventListener('click', () => {
+      currentCategory = tab.getAttribute('data-category') || '全部';
+      categoryTabs.forEach((t) => t.classList.toggle('active', t === tab));
+      filterItems();
+    });
+  });
+
+  document.querySelectorAll('.subtag-tab').forEach((tab) => {
+    tab.addEventListener('click', () => {
+      const tag = tab.getAttribute('data-tag') || '';
+      if (currentTag === tag) {
+        currentTag = '';
+        document.querySelectorAll('.subtag-tab').forEach((t) => t.classList.remove('active'));
+      } else {
+        currentTag = tag;
+        document.querySelectorAll('.subtag-tab').forEach((t) => {
+          t.classList.toggle('active', t.getAttribute('data-tag') === tag);
+        });
+      }
+      filterItems();
+    });
+  });
+
+  subtagExpand?.addEventListener('click', () => {
+    const expanded = subtagExpand.dataset.expanded === 'true';
+    subtagExpand.dataset.expanded = expanded ? 'false' : 'true';
+    subtagExpand.textContent = expanded ? `全部 ${document.querySelectorAll('.subtag-tab').length} 个标签 ▼` : '收起 ▲';
+    if (subtagExtra) subtagExtra.style.display = expanded ? 'none' : 'contents';
+  });
+</script>
