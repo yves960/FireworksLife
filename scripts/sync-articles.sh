@@ -1,67 +1,61 @@
 #!/bin/bash
-# sync-articles.sh - 将 workspace-director/articles 同步到鱼腹博客
+# sync-articles.sh - 将 articles 同步到 FireworksLife content 分支
 # 用法: ./scripts/sync-articles.sh
+# 
+# 流程：articles push → FireworksLife sync workflow → content 分支暂存
+# 发布：需在 FireworksLife 仓库手动触发 "Deploy to Netlify" workflow
 
-ARTICLES_DIR="/Users/sy/.openclaw/workspace-director/articles"
-BLOG_DIR="/Users/sy/Projects/self/FireworksLife/frontend/src/content/blog"
+ARTICLES_DIR="$HOME/Projects/self/articles"
+BLOG_DIR="$HOME/Projects/self/FireworksLife/frontend/src/content/blog"
 
 echo "📚 开始同步文章..."
 echo "源目录: $ARTICLES_DIR"
 echo "目标目录: $BLOG_DIR"
 
-# 确保目标目录存在
 mkdir -p "$BLOG_DIR"
-
-# 排除的目录（子目录文章太多，暂时不处理）
-EXCLUDE_DIRS="ai-assisted-dev-specs ai-replacement-series"
 
 count=0
 
-# 遍历顶级 markdown 文件
 for file in "$ARTICLES_DIR"/*.md; do
   [ -f "$file" ] || continue
   
   filename=$(basename "$file")
   
-  # 跳过 README
   if [ "$filename" = "README.md" ]; then
     continue
   fi
   
-  # 检查是否已迁移
-  blog_file="$BLOG_DIR/$filename"
-  if [ -f "$blog_file" ]; then
-    echo "⏭️  跳过（已存在）: $filename"
-    continue
-  fi
-  
-  # 提取标题和日期
   title=$(head -1 "$file" | sed 's/^# //' | sed 's/"/\\"/g')
   date=$(echo "$filename" | grep -oE '[0-9]{4}-[0-9]{2}-[0-9]{2}' | head -1 || echo "2026-03-30")
   
-  # 创建带 frontmatter 的文件
-  cat > "$blog_file" << FRONTMATTER
----
-title: "${title}"
-description: "${title}"
-pubDate: ${date}
-category: "技术"
-tags: ["AI", "开发"]
----
-
-FRONTMATTER
+  blog_file="$BLOG_DIR/$filename"
   
-  # 追加内容（去掉第一个 H1）
-  tail -n +2 "$file" >> "$blog_file"
-  
-  echo "✅ 已同步: $filename"
-  count=$((count + 1))
+  # 内容变化才同步
+  if [ ! -f "$blog_file" ] || ! diff -q "$file" "$blog_file" > /dev/null 2>&1; then
+    {
+      echo "---"
+      echo "title: \"${title}\""
+      echo "description: \"${title}\""
+      echo "pubDate: ${date}"
+      echo "category: \"技术\""
+      echo "tags: [\"AI\", \"开发\"]"
+      echo "---"
+      echo ""
+      tail -n +2 "$file"
+    } > "$blog_file"
+    echo "✅ 已同步: $filename"
+    count=$((count + 1))
+  else
+    echo "⏭️  未变化: $filename"
+  fi
 done
 
 echo ""
 echo "✨ 完成！共同步 $count 篇文章"
 echo ""
 echo "下一步:"
-echo "  1. cd frontend && npm run build  # 本地测试"
-echo "  2. git add . && git commit -m 'chore: sync new articles'"
-echo "  3. git push  # 推送到 GitHub，Netlify 自动部署"
+echo "  1. cd $HOME/Projects/self/FireworksLife"
+echo "  2. git checkout content"
+echo "  3. cp ~/Projects/self/articles/*.md frontend/src/content/blog/"
+echo "  4. git add . && git commit && git push"
+echo "  5. 在 FireworksLife 仓库触发 'Deploy to Netlify' workflow"

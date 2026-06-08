@@ -13,6 +13,7 @@ export async function getStaticPaths() {
 const { post } = Astro.props;
 const { Content, headings } = await render(post);
 const readingMinutes = Math.max(1, Math.ceil((post.body?.split(/\s+/).length ?? 0) / 220));
+const wordCount = post.body?.replace(/\s+/g, '').length ?? 0;
 const postSlug = post.id;
 const postTitle = post.data.title;
 ---
@@ -57,6 +58,10 @@ const postTitle = post.data.title;
             <div>
               <span class="meta-label">阅读时长</span>
               <strong>{readingMinutes} min</strong>
+            </div>
+            <div>
+              <span class="meta-label">字数</span>
+              <strong>{wordCount.toLocaleString()}</strong>
             </div>
             <div>
               <span class="meta-label">栏目</span>
@@ -143,6 +148,16 @@ const postTitle = post.data.title;
 
   const postSlug = engagementBar?.dataset.postSlug || commentsShell?.dataset.postSlug || '';
   const postTitle = engagementBar?.dataset.postTitle || commentsShell?.dataset.postTitle || '';
+
+  const authorKey = 'yufu:comment-author';
+
+  // Restore saved author name
+  if (commentAuthor) {
+    const savedAuthor = localStorage.getItem(authorKey);
+    if (savedAuthor) {
+      commentAuthor.value = savedAuthor;
+    }
+  }
 
   const clientIdKey = 'yufu:client-id';
   const getClientId = () => {
@@ -389,6 +404,9 @@ const postTitle = post.data.title;
           throw new Error(data.error || '发布失败');
         }
         commentContent.value = '';
+        if (commentAuthor) {
+          localStorage.setItem(authorKey, commentAuthor.value.trim());
+        }
         clearReplying();
         setStatus(data.pending ? '评论已提交，等待审核。' : '评论已发布。');
         applyEngagementState(data);
@@ -488,7 +506,7 @@ const postTitle = post.data.title;
   .post-hero {
     margin-top: 1rem;
     padding: clamp(1.8rem, 4vw, 3rem);
-    overflow: hidden;
+    overflow: clip;
   }
 
   .post-hero::after {
@@ -613,7 +631,6 @@ const postTitle = post.data.title;
     border-radius: 24px;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.04);
-    overflow: hidden;
   }
 
   .meta-panel {
@@ -624,6 +641,7 @@ const postTitle = post.data.title;
       transform 0.25s ease,
       border-color 0.25s ease,
       box-shadow 0.25s ease;
+    overflow: clip;
   }
 
   .meta-panel:hover {

@@ -4,6 +4,8 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "astro dev",
+    "dev:mock": "concurrently \"node scripts/mock-server.mjs\" \"astro dev\"",
+    "mock": "node scripts/mock-server.mjs",
     "build": "astro build",
     "preview": "astro preview"
   },
@@ -13,5 +15,8 @@
     "@netlify/blobs": "^8.1.0",
     "astro": "^6.1.5",
     "motion": "^12.38.0"
+  },
+  "devDependencies": {
+    "concurrently": "^9.1.0"
   }
 }

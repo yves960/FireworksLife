@@ -810,8 +810,10 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
             const rect = card.getBoundingClientRect();
             const x = event.clientX - rect.left;
             const y = event.clientY - rect.top;
-            card.style.setProperty('--spot-x', `${x}px`);
-            card.style.setProperty('--spot-y', `${y}px`);
+            const pxX = (x / rect.width) * 100;
+            const pxY = (y / rect.height) * 100;
+            card.style.setProperty('--spot-x', `${pxX}%`);
+            card.style.setProperty('--spot-y', `${pxY}%`);
             card.style.setProperty('--rotate-x', `${((y / rect.height) - 0.5) * -8}deg`);
             card.style.setProperty('--rotate-y', `${((x / rect.width) - 0.5) * 10}deg`);
           });

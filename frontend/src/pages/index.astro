@@ -113,6 +113,16 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
       {allTags.slice(0, 10).map((tag) => (
         <button class="subtag-tab" data-tag={tag}>{tag}</button>
       ))}
+      {allTags.length > 10 && (
+        <button class="subtag-expand" id="subtagExpand" data-expanded="false">
+          全部 {allTags.length} 个标签 ▼
+        </button>
+      )}
+      <div class="subtag-extra" id="subtagExtra" style="display:none;">
+        {allTags.slice(10).map((tag) => (
+          <button class="subtag-tab" data-tag={tag}>{tag}</button>
+        ))}
+      </div>
     </div>
   </section>
 
@@ -185,6 +195,40 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
   let currentCategory = '全部';
   let currentTag = '';
   let searchText = '';
+
+  const subtagExpand = document.getElementById('subtagExpand');
+  const subtagExtra = document.getElementById('subtagExtra');
+
+  subtagExpand?.addEventListener('click', () => {
+    const expanded = subtagExpand.dataset.expanded === 'true';
+    if (expanded) {
+      subtagExpand.dataset.expanded = 'false';
+      subtagExpand.textContent = `全部 {${document.querySelectorAll('.subtag-tab').length}} 个标签 ▼`;
+      if (subtagExtra) subtagExtra.style.display = 'none';
+    } else {
+      subtagExpand.dataset.expanded = 'true';
+      subtagExpand.textContent = '收起 ▲';
+      if (subtagExtra) subtagExtra.style.display = 'contents';
+    }
+    // Re-query subtag tabs after expanding to bind events
+    document.querySelectorAll('.subtag-tab').forEach((tab) => {
+      if (tab.dataset.bound) return;
+      tab.dataset.bound = 'true';
+      tab.addEventListener('click', () => {
+        const tag = tab.getAttribute('data-tag') || '';
+        if (currentTag === tag) {
+          currentTag = '';
+          document.querySelectorAll('.subtag-tab').forEach((item) => item.classList.remove('active'));
+        } else {
+          currentTag = tag;
+          document.querySelectorAll('.subtag-tab').forEach((item) => {
+            item.classList.toggle('active', item.getAttribute('data-tag') === tag);
+          });
+        }
+        filterCards();
+      });
+    });
+  });
 
   const clientIdKey = 'yufu:client-id';
   const getClientId = () => {
@@ -872,6 +916,30 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
   .subtag-tabs {
     margin-top: 1rem;
     align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .subtag-extra {
+    display: contents;
+  }
+
+  .subtag-expand {
+    border-radius: 999px;
+    border: 1px dashed rgba(255, 255, 255, 0.15);
+    background: transparent;
+    color: var(--text-muted);
+    padding: 0.6rem 0.95rem;
+    font: inherit;
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease;
+  }
+
+  .subtag-expand:hover {
+    color: var(--accent-soft);
+    border-color: rgba(255, 179, 71, 0.4);
   }
 
   .subtag-label {
