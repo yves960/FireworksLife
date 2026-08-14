@@ -95,7 +95,7 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
   }
 
   .blog-list-desc {
-    color: var(--muted);
+    color: var(--text-muted);
     font-size: 0.95rem;
     margin: 0;
   }
@@ -112,7 +112,7 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
   .blog-item {
     display: block;
     padding: 1.5rem 0;
-    border-bottom: 1px solid var(--border);
+    border-bottom: 1px solid var(--surface-outline);
     text-decoration: none;
     color: inherit;
     transition: background 0.2s;
@@ -127,7 +127,7 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
     gap: 0.75rem;
     margin-bottom: 0.5rem;
     font-size: 0.8rem;
-    color: var(--muted);
+    color: var(--text-muted);
   }
   .blog-item-meta time {
     font-variant-numeric: tabular-nums;
@@ -140,7 +140,7 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
   }
 
   .blog-item-desc {
-    color: var(--muted);
+    color: var(--text-muted);
     font-size: 0.9rem;
     margin: 0 0 0.6rem;
     line-height: 1.5;

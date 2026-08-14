@@ -203,7 +203,7 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     const expanded = subtagExpand.dataset.expanded === 'true';
     if (expanded) {
       subtagExpand.dataset.expanded = 'false';
-      subtagExpand.textContent = `全部 {${document.querySelectorAll('.subtag-tab').length}} 个标签 ▼`;
+      subtagExpand.textContent = `全部 ${document.querySelectorAll('.subtag-tab').length} 个标签 ▼`;
       if (subtagExtra) subtagExtra.style.display = 'none';
     } else {
       subtagExpand.dataset.expanded = 'true';
