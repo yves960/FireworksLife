@@ -24,3 +24,10 @@ data/
 *.swp
 *.swo
 *~
+
+# --- Agent / editor runtime ---
+.claude/
+.astro/
+.vercel/
+*.tsbuildinfo
+coverage/
