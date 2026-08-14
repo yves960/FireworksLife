@@ -32,6 +32,19 @@ cd frontend
 npm run build
 ```
 
+## Scripts
+
+```bash
+cd frontend
+npm run dev        # 本地开发（astro dev，默认 :4321）
+npm run dev:mock   # 同时启动 mock server（:4322）+ astro dev，本地调试 Netlify Functions
+npm run mock       # 仅启动 mock server
+npm run build      # 生产构建（输出 frontend/dist）
+npm run preview    # 预览构建产物
+```
+
+仓库根目录 `scripts/sync-articles.sh` 为文章同步脚本（CI 使用）。
+
 ## 部署
 
 仓库根目录已经配置了 `netlify.toml`，Netlify 会：
@@ -55,6 +68,11 @@ npm run build
 │   │   └── pages/
 │   ├── astro.config.mjs
 │   └── package.json
+├── memory/                 # 产品创意笔记（入库保留）
+├── openspec/               # OpenSpec 规格
+├── scripts/                # 文章同步等源码脚本（入库保留）
 ├── netlify.toml
 └── README.md
+
+> 约定：`frontend/scripts/mock-server.mjs` 与根 `scripts/` 为被 package.json / CI 引用的源码脚本，保持入库；`.claude/`、`.astro/`、`.venv/`、`node_modules/`、`dist/` 等运行时产物由 `.gitignore` 排除。
 ```
