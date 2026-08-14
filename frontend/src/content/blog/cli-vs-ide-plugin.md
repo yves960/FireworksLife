@@ -1,5 +1,5 @@
 ---
-title: "查看今日日程"
+title: "CLI vs IDE 插件：AI 编程工具的形态之争"
 description: "为什么一夜之间大家都在做 CLI？因为 AI 天生文本进、文本出，CLI 是它与系统交互的最短路径。本文对比 CLI 与 IDE 插件两种 AI 载体在交互方式、组合能力与自动化程度上的差异，讲清 AI 编程工具的形态之争。"
 pubDate: 2026-03-30
 category: "基础概念"
