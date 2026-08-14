@@ -1,6 +1,6 @@
 ---
 title: "Agent和Harness：我为什么说这不是两个概念，而是一套世界观"
-description: "Agent和Harness：我为什么说这不是两个概念，而是一套世界观"
+description: "Agent 和 Harness 不是两个孤立的概念，而是一套理解 AI 编程的完整世界观。从'工具观'与'员工观'的分野讲起，说明为什么模型之外的那层'壳'决定了 Agent 的真实上限，帮你建立 Agent + Harness 的统一心智模型。"
 pubDate: 
 category: "技术"
 tags:

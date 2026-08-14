@@ -1,6 +1,6 @@
 ---
 title: "如何用 AI 代替我：第二章 - 我的 OpenCode 配置详解"
-description: "如何用 AI 代替我：第二章 - 我的 OpenCode 配置详解"
+description: "'如何用 AI 代替我'系列第二章：逐项拆解我的 OpenCode 配置——每个插件、每个参数、每个 Skill 的用途与取舍，从配置文件结构讲到实战工作流，一份可直接抄作业的 CLI Agent 配置指南。"
 pubDate: 2026-03-30
 category: "实践"
 tags: ["AI", "开发"]

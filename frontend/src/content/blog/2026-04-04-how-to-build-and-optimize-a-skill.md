@@ -1,6 +1,6 @@
 ---
 title: "如何逐步实现并优化一个 AI Agent Skill"
-description: "如何逐步实现并优化一个 AI Agent Skill"
+description: "以跨微服务调用链分析工具 flow-trace 的演进为例，复盘一个 AI Agent Skill 从 0 到 1、再到 30+ 次迭代的完整历程：如何发现真实问题、划定能力边界、逐步打磨提示词与工作流，最终成长为体验流畅的分析助手。一篇可复用的 Skill 工程实践复盘。"
 pubDate: 2026-04-04
 category: "技术"
 tags:

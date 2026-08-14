@@ -1,6 +1,6 @@
 ---
 title: "Claude Code 源码架构分析"
-description: "Claude Code 源码架构分析"
+description: "基于 2026-03-31 泄露的源码快照，逐层拆解 Claude Code 的整体架构：CLI 交互循环、工具系统设计、上下文管理与安全边界，看懂这个现象级 AI 编程工具在工程层面如何组织代码、控制风险并保持可扩展。"
 pubDate: 2026-03-30
 category: "源码分析"
 tags: ["AI", "开发"]

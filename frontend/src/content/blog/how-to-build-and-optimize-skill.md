@@ -1,6 +1,6 @@
 ---
 title: "flow-trace"
-description: "flow-trace"
+description: "flow-trace 是一个分析 Java 微服务调用链的 AI Agent Skill，从简单的代码分析工具起步，历经 30+ 次迭代成长为功能完善的分析助手。本文完整记录每个阶段的问题、决策与优化手法，是 Skill 工程化的一手实践资料。"
 pubDate: 2026-03-30
 category: "实践"
 tags: ["AI", "开发"]
