@@ -26,13 +26,26 @@ const sanitizeSlug = (value) =>
 const getClientId = (request, url) =>
   request.headers.get('x-client-id') || url.searchParams.get('clientId') || '';
 
-const toPublicComments = (comments = []) =>
+const toPublicComment = (item, clientId) => ({
+  id: item.id,
+  author: item.author,
+  content: item.content,
+  createdAt: item.createdAt,
+  parentId: item.parentId,
+  status: item.status,
+  // 身份比对只在服务端做，clientId 永不出站（修复历史泄漏）
+  isMine: Boolean(clientId && item.clientId === clientId),
+});
+
+const toPublicComments = (comments = [], clientId = '') =>
   comments
     .filter((item) => item.status === 'approved')
     .filter((item) => !item.parentId)
     .map((item) => ({
-      ...item,
-      replies: comments.filter((reply) => reply.parentId === item.id && reply.status === 'approved'),
+      ...toPublicComment(item, clientId),
+      replies: comments
+        .filter((reply) => reply.parentId === item.id && reply.status === 'approved')
+        .map((reply) => toPublicComment(reply, clientId)),
     }));
 
 async function getPostState(slug) {
@@ -86,7 +99,7 @@ export default async (request) => {
       liked: Boolean(clientId && postState.likesBy?.[clientId]),
       likesCount: Object.keys(postState.likesBy || {}).length,
       favorited: favorites.some((item) => item.slug === slug),
-      comments: toPublicComments(postState.comments || []),
+      comments: toPublicComments(postState.comments || [], clientId),
     });
   }
 
@@ -183,7 +196,7 @@ export default async (request) => {
     return json(200, {
       moderationMode: MODERATION_MODE,
       pending: MODERATION_MODE === 'manual',
-      comments: toPublicComments(postState.comments),
+      comments: toPublicComments(postState.comments, clientId),
     });
   }
 
@@ -205,7 +218,7 @@ export default async (request) => {
 
     postState.comments = (postState.comments || []).filter((item) => item.id !== commentId && item.parentId !== commentId);
     await savePostState(slug, postState);
-    return json(200, { comments: toPublicComments(postState.comments) });
+    return json(200, { comments: toPublicComments(postState.comments, clientId) });
   }
 
   return json(400, { error: '不支持的 action' });

@@ -10,6 +10,7 @@ const blog = defineCollection({
     category: z.string().default('默认'),
     subTag: z.string().optional(),
     tags: z.array(z.string()).optional(),
+    cover: z.string().optional(),
   }),
 });
 

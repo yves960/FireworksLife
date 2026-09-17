@@ -2,9 +2,12 @@
 interface Props {
   title: string;
   description?: string;
+  image?: string;
 }
 
-const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } = Astro.props;
+const { title, description = "鱼腹 - 一个更有舞台感的个人博客", image } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+const ogImageURL = new URL(image || '/og.jpg', Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -14,6 +17,19 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta name="description" content={description} />
     <title>{title}</title>
+    <link rel="canonical" href={canonicalURL} />
+    <link rel="alternate" type="application/rss+xml" title="鱼腹 FireworksLife RSS" href={new URL('/rss.xml', Astro.site)} />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="鱼腹 FireworksLife" />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonicalURL} />
+    <meta property="og:locale" content="zh_CN" />
+    <meta property="og:image" content={ogImageURL} />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={title} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImageURL} />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -703,9 +719,14 @@ const { title, description = "鱼腹 - 一个更有舞台感的个人博客" } =
           justify-content: center;
         }
 
-        .cursor-glow,
-        .pet-sprite {
+        .cursor-glow {
           display: none;
+        }
+
+        /* 移动端：小鱼不消失，吸附右下角继续呼吸/游动（触屏没有鼠标可跟随） */
+        .pet-sprite {
+          transform: translate(calc(100vw - 6rem), calc(100vh - 7rem)) scale(0.75) !important;
+          rotate: 0deg !important;
         }
 
         main {

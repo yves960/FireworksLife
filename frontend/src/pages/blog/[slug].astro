@@ -18,7 +18,7 @@ const postSlug = post.id;
 const postTitle = post.data.title;
 ---
 
-<Base title={post.data.title} description={post.data.description}>
+<Base title={post.data.title} description={post.data.description} image={post.data.cover}>
   <article class="blog-post">
     <a href="/" class="back-link reveal" style="--reveal-delay: 0">返回首页</a>
 
@@ -184,8 +184,8 @@ const postTitle = post.data.title;
       author: string;
       content: string;
       createdAt: string;
-      clientId?: string;
-      replies?: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string }>;
+      isMine?: boolean;
+      replies?: Array<{ id: string; author: string; content: string; createdAt: string; isMine?: boolean }>;
     }>;
     moderationMode?: string;
   }) => {
@@ -221,9 +221,8 @@ const postTitle = post.data.title;
     }
   };
 
-  const renderComments = (items: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string; replies?: Array<{ id: string; author: string; content: string; createdAt: string; clientId?: string }> }>) => {
+  const renderComments = (items: Array<{ id: string; author: string; content: string; createdAt: string; isMine?: boolean; replies?: Array<{ id: string; author: string; content: string; createdAt: string; isMine?: boolean }> }>) => {
     if (!commentList || !commentEmpty) return;
-    const clientId = getClientId();
 
     commentList.innerHTML = items
       .slice()
@@ -238,7 +237,7 @@ const postTitle = post.data.title;
             <div class="comment-actions">
               <button type="button" class="comment-reply" data-comment-id="${item.id}" data-comment-author="${item.author}">回复</button>
               ${
-                item.clientId === clientId
+                item.isMine
                   ? `<button type="button" class="comment-delete" data-comment-id="${item.id}">删除</button>`
                   : ''
               }
@@ -261,7 +260,7 @@ const postTitle = post.data.title;
                             </div>
                             <div class="comment-actions">
                               ${
-                                reply.clientId === clientId
+                                reply.isMine
                                   ? `<button type="button" class="comment-delete" data-comment-id="${reply.id}">删除</button>`
                                   : ''
                               }
@@ -438,6 +437,10 @@ const postTitle = post.data.title;
     }
 
     if (!button || !postSlug) return;
+
+    if (!window.confirm('确定删除这条评论吗？删除后不可恢复。')) {
+      return;
+    }
 
     setStatus('正在删除...');
     fetch('/.netlify/functions/engagement', {
