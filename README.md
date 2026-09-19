@@ -36,11 +36,13 @@ npm run build
 
 ```bash
 cd frontend
-npm run dev        # 本地开发（astro dev，默认 :4321）
-npm run dev:mock   # 同时启动 mock server（:4322）+ astro dev，本地调试 Netlify Functions
-npm run mock       # 仅启动 mock server
-npm run build      # 生产构建（输出 frontend/dist）
-npm run preview    # 预览构建产物
+npm run dev            # 默认开发入口：mock server（:4322）+ astro dev（:4321），评论/点赞/收藏本地可测
+npm run dev:no-mock    # 仅 astro dev（Netlify Functions 本地 404）
+npm run dev:mock       # 等价于 dev
+npm run mock           # 仅启动 mock server
+npm run check:content  # 内容护栏：文章 frontmatter 的 pubDate 不得为空
+npm run build          # check:content + 生产构建（输出 frontend/dist）
+npm run preview        # 预览构建产物
 ```
 
 仓库根目录 `scripts/sync-articles.sh` 为文章同步脚本（CI 使用）。

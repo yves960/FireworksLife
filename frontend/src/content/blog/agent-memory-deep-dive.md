@@ -1,7 +1,7 @@
 ---
 title: "Agent Memory：一个让我重新思考\"记忆\"概念的框架"
 description: "如果 Agent 每次对话都是全新的开始，它能成为真正的智能吗？深入剖析 Agent Memory 框架：记忆如何分类、如何写入与检索、如何随时间演化，以及一套设计良好的记忆系统为什么会让 Agent 越用越懂你。重新思考'记忆'这件事。"
-pubDate: 
+pubDate: 2026-04-10
 category: "技术"
 tags:
   - AI

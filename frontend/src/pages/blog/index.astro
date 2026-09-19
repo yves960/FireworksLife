@@ -18,7 +18,7 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
 
   <section class="control-shell reveal" style="--reveal-delay: 1">
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索标题、关键词" />
+      <input type="text" id="searchInput" placeholder="搜索标题、摘要、关键词" />
     </div>
     <div class="category-tabs">
       {categories.map((cat) => (
@@ -30,7 +30,7 @@ const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
       {allTags.slice(0, 10).map((tag) => (
         <button class="subtag-tab" data-tag={tag}>{tag}</button>
       ))}
-      {allTags.length > 10 && (
+      {allTags.length > 3 && (
         <button class="subtag-expand" id="subtagExpand" data-expanded="false">
           全部 {allTags.length} 个标签 ▼
         </button>

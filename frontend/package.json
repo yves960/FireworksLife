@@ -4,8 +4,10 @@
   "version": "0.0.1",
   "scripts": {
     "dev": "concurrently \"node scripts/mock-server.mjs\" \"astro dev\"",
-    "dev:astro": "astro dev",
+    "dev:no-mock": "astro dev",
     "dev:mock": "concurrently \"node scripts/mock-server.mjs\" \"astro dev\"",
+    "check:content": "node scripts/check-pubdate.mjs",
+    "build": "npm run check:content && astro build",
     "mock": "node scripts/mock-server.mjs",
     "build": "astro build",
     "preview": "astro preview"

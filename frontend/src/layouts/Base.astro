@@ -823,6 +823,11 @@ const ogImageURL = new URL(image || '/og.jpg', Astro.site);
           setPetMood('excited');
         });
 
+        // 点赞/收藏联动：小鱼跟着激动一下（[slug].astro 里派发 yufu:pet-excite）
+        window.addEventListener('yufu:pet-excite', () => {
+          setPetMood('excited', '开心!');
+        });
+
         window.addEventListener('resize', () => {
           updatePetTarget();
         });

@@ -1,7 +1,7 @@
 ---
-title: "Beads和OpenSpec：为什么AI代理需要两套系统"
+title: "Beads 和 OpenSpec：为什么 AI 代理需要两套系统"
 description: "AI 代理越来越强，但'能写代码'不等于'写得对'。本文解释为什么 AI 代理需要 Beads 与 OpenSpec 两套系统：一套管理任务的粒度与依赖，一套约束规格与变更流程，双系统配合让代理的产出可控、可验证、可追溯。"
-pubDate: 
+pubDate: 2026-04-10
 category: "技术"
 tags:
   - AI

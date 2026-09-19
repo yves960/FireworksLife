@@ -1,7 +1,7 @@
 ---
-title: "AI辅助研发工具地图"
+title: "AI 辅助研发工具地图"
 description: "一张 AI 辅助研发的全景工具地图：覆盖需求、编码、测试到 DevOps 的完整链路，梳理每个环节值得引入的 AI 工具与组合方式，帮你快速定位团队的最佳切入点，搭建属于自己的 AI 增强研发流水线。"
-pubDate: 
+pubDate: 2026-04-10
 category: "技术"
 tags:
   - AI

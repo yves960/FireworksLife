@@ -157,7 +157,7 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
         </div>
 
         <div class="card-body">
-          <p class="post-index">0{index + 1}</p>
+          <p class="post-index">{String(index + 1).padStart(2, '0')}</p>
           <h3>{post.data.title}</h3>
           <p class="post-excerpt">{post.data.description}</p>
         </div>

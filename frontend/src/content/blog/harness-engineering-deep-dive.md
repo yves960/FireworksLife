@@ -1,7 +1,7 @@
 ---
 title: "Harness Engineering：一个被忽视的真相"
 description: "同一个模型，只换外面那层'壳'，编程成功率就从 42% 跳到 78%。Harness Engineering 是被多数团队忽视的真相：模型能力之外，运行环境、工具接入与反馈回路才是拉开差距的关键。本文带你深入这门被低估的工程学科。"
-pubDate: 
+pubDate: 2026-04-10
 category: "技术"
 tags:
   - AI

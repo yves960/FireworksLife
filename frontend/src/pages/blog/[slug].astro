@@ -320,6 +320,7 @@ const postTitle = post.data.title;
 
   likeButton?.addEventListener('click', () => {
     if (!postSlug) return;
+    window.dispatchEvent(new CustomEvent('yufu:pet-excite'));
     fetch('/.netlify/functions/engagement', {
       method: 'POST',
       headers: {
@@ -342,6 +343,7 @@ const postTitle = post.data.title;
 
   favoriteButton?.addEventListener('click', () => {
     if (!postSlug) return;
+    window.dispatchEvent(new CustomEvent('yufu:pet-excite'));
     fetch('/.netlify/functions/engagement', {
       method: 'POST',
       headers: {

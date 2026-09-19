@@ -1,7 +1,7 @@
 ---
-title: "Claude Code的代码检索之争：一场关于\"精准\"的误会"
+title: "Claude Code 的代码检索之争：一场关于\"精准\"的误会"
 description: "工程师让 Claude Code 找 bug，它反复 grep 一分钟颗粒无收。这场关于代码检索'精准'的误会，根源在于对索引与检索机制的理解偏差。本文复盘 Claude Code 代码检索之争的来龙去脉，讲清代码索引到底应该怎么做。"
-pubDate: 
+pubDate: 2026-04-10
 category: "技术"
 tags:
   - AI
