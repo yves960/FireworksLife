@@ -99,7 +99,9 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     </div>
 
     <div class="search-box">
-      <input type="text" id="searchInput" placeholder="搜索标题、摘要、关键词" />
+      <input type="text" id="searchInput" role="searchbox" aria-label="搜索文章" placeholder="搜索标题、摘要、关键词" />
+      <button type="button" class="search-clear" id="searchClear" aria-label="清空搜索" hidden>×</button>
+      <span class="search-count" id="searchCount" aria-live="polite"></span>
     </div>
 
     <div class="category-tabs">
@@ -126,7 +128,7 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     </div>
   </section>
 
-  <section class="favorites-shell reveal" id="favoritesShell" style="display: none; --reveal-delay: 1;">
+  <section class="favorites-shell reveal" id="favoritesShell" style="--reveal-delay: 1;">
     <div class="controls-header">
       <div>
         <p class="section-kicker">Saved Signals</p>
@@ -184,6 +186,8 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
 
 <script>
   const searchInput = document.getElementById('searchInput') as HTMLInputElement | null;
+  const searchClear = document.getElementById('searchClear') as HTMLButtonElement | null;
+  const searchCount = document.getElementById('searchCount');
   const categoryTabs = document.querySelectorAll('.category-tab');
   const subTagTabs = document.querySelectorAll('.subtag-tab');
   const cards = document.querySelectorAll('.post-card');
@@ -274,6 +278,49 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     if (subTagTabsContainer) {
       subTagTabsContainer.style.opacity = currentCategory === '全部' ? '1' : '0.88';
     }
+
+    if (searchCount) {
+      searchCount.textContent =
+        searchText || currentCategory !== '全部' || currentTag ? `找到 ${visibleCount} 篇` : '';
+    }
+
+    shownLimit = PAGE_SIZE;
+    applyPagination();
+  }
+
+  // 客户端分页：当前匹配集每页 12 张，超出一页才出现「加载更多」
+  const PAGE_SIZE = 12;
+  let shownLimit = 12;
+
+  function applyPagination() {
+    let matchIndex = 0;
+    let hasMore = false;
+    cards.forEach((card) => {
+      const el = card as HTMLElement;
+      if (el.style.display === 'none' && !el.dataset.paginated) return;
+      matchIndex += 1;
+      const overLimit = matchIndex > shownLimit;
+      if (overLimit) hasMore = true;
+      el.style.display = overLimit ? 'none' : '';
+      if (overLimit) el.dataset.paginated = '1'; else delete el.dataset.paginated;
+    });
+    const grid = document.getElementById('postsGrid');
+    let loadMore = document.getElementById('loadMoreBtn') as HTMLButtonElement | null;
+    if (hasMore && !loadMore && grid) {
+      loadMore = document.createElement('button');
+      loadMore.type = 'button';
+      loadMore.id = 'loadMoreBtn';
+      loadMore.className = 'load-more';
+      loadMore.textContent = '加载更多';
+      loadMore.addEventListener('click', () => {
+        shownLimit += PAGE_SIZE;
+        applyPagination();
+      });
+      grid.insertAdjacentElement('afterend', loadMore);
+    }
+    if (loadMore) {
+      loadMore.hidden = !hasMore;
+    }
   }
 
   function renderFavorites() {
@@ -289,8 +336,9 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
         const favorites = Array.isArray(data.favorites) ? data.favorites : [];
 
         if (!favorites.length) {
-          favoritesShell.style.display = 'none';
-          favoritesGrid.innerHTML = '';
+          favoritesShell.style.display = 'block';
+          favoritesGrid.innerHTML =
+            '<p class="favorites-empty">还没有收藏，去下面挑几篇有意思的吧。</p>';
           return;
         }
 
@@ -308,8 +356,9 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
           .join('');
       })
       .catch(() => {
-        favoritesShell.style.display = 'none';
-        favoritesGrid.innerHTML = '';
+        favoritesShell.style.display = 'block';
+        favoritesGrid.innerHTML =
+          '<p class="favorites-empty">收藏服务暂时不可达，稍后再来看看。</p>';
       });
   }
 
@@ -350,13 +399,90 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
 
   searchInput?.addEventListener('input', (event) => {
     searchText = normalize((event.target as HTMLInputElement).value);
+    if (searchClear) {
+      searchClear.hidden = !searchText;
+    }
     filterCards();
+  });
+
+  searchClear?.addEventListener('click', () => {
+    if (!searchInput) return;
+    searchInput.value = '';
+    searchText = '';
+    searchClear.hidden = true;
+    filterCards();
+    searchInput.focus();
+  });
+
+  document.addEventListener('keydown', (event) => {
+    const target = event.target as HTMLElement;
+    const typing = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+    if (event.key === '/' && !typing) {
+      event.preventDefault();
+      searchInput?.focus();
+    }
+    if (event.key === 'Escape' && target === searchInput) {
+      if (searchInput) {
+        searchInput.value = '';
+        searchText = '';
+      }
+      if (searchClear) {
+        searchClear.hidden = true;
+      }
+      filterCards();
+      searchInput?.blur();
+    }
   });
 
   renderFavorites();
 </script>
 
 <style>
+  .search-clear {
+    position: absolute;
+    right: 3.2rem;
+    top: 50%;
+    transform: translateY(-50%);
+    border: none;
+    background: transparent;
+    color: inherit;
+    opacity: 0.55;
+    cursor: pointer;
+    font-size: 1rem;
+    line-height: 1;
+    padding: 0.2rem 0.45rem;
+  }
+
+  .search-clear:hover {
+    opacity: 1;
+  }
+
+  .search-count {
+    position: absolute;
+    right: 0.95rem;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 0.72rem;
+    opacity: 0.55;
+    white-space: nowrap;
+  }
+
+  .load-more {
+    display: block;
+    margin: 1.4rem auto 2.4rem;
+    padding: 0.55rem 1.6rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    background: rgba(255, 255, 255, 0.06);
+    color: inherit;
+    cursor: pointer;
+  }
+
+  .favorites-empty {
+    grid-column: 1 / -1;
+    opacity: 0.62;
+    font-size: 0.9rem;
+  }
   .hero {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(330px, 0.8fr);
