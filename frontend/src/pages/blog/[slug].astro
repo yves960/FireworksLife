@@ -109,6 +109,7 @@ const postTitle = post.data.title;
         <input id="commentAuthor" type="text" maxlength="24" placeholder="你的名字" />
         <textarea id="commentContent" rows="4" maxlength="300" placeholder="写点想法、反馈或者吐槽"></textarea>
         <input id="replyParentId" type="hidden" value="" />
+        <input class="honeypot" id="commentWebsite" name="website" type="text" tabindex="-1" autocomplete="off" aria-hidden="true" />
         <div class="replying-banner" id="replyingBanner" style="display: none;">
           <span id="replyingText"></span>
           <button type="button" class="reply-cancel" id="replyCancel">取消回复</button>
@@ -397,7 +398,7 @@ const postTitle = post.data.title;
         'content-type': 'application/json',
         'x-client-id': getClientId(),
       },
-      body: JSON.stringify({ slug: postSlug, action: 'comment', author, content, parentId: replyParentId.value }),
+      body: JSON.stringify({ slug: postSlug, action: 'comment', author, content, parentId: replyParentId.value, website: (document.getElementById('commentWebsite') as HTMLInputElement | null)?.value ?? '' }),
     })
       .then(async (response) => {
         const data = await response.json().catch(() => ({}));
@@ -896,6 +897,14 @@ const postTitle = post.data.title;
     max-width: 32rem;
     color: var(--text-secondary);
     line-height: 1.7;
+  }
+
+  .honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
   }
 
   .comment-form {

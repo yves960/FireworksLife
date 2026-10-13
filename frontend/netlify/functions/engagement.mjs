@@ -1,6 +1,7 @@
 import { getStore } from '@netlify/blobs';
 
-const MODERATION_MODE = 'auto';
+// 审核模式：默认 manual（公开博客零防线不可接受），环境变量 MODERATION_MODE=auto 可切回
+const MODERATION_MODE = process.env.MODERATION_MODE === 'auto' ? 'auto' : 'manual';
 
 const json = (status, body) =>
   new Response(JSON.stringify(body), {
@@ -165,6 +166,11 @@ export default async (request) => {
     const content = sanitizeText(body.content, 300);
     const parentId = sanitizeText(body.parentId, 80);
 
+    // honeypot：隐藏字段，真用户不会填，机器人填了直接拒绝
+    if (sanitizeText(body.website, 80)) {
+      return json(400, { error: '请求被拒绝。' });
+    }
+
     if (!content) {
       return json(400, { error: '评论不能为空' });
     }
@@ -174,13 +180,20 @@ export default async (request) => {
     }
 
     const now = Date.now();
-    const lastCommentAt = postState.rateLimit?.[clientId] || 0;
-    if (now - lastCommentAt < 15_000) {
-      return json(429, { error: '发得有点快，15 秒后再试。' });
+    postState.rateLimit ||= {};
+    // 滑动窗口限流：1 分钟内最多 1 条、5 分钟内最多 3 条（兼容旧单时间戳数据）
+    const rawHistory = postState.rateLimit[clientId];
+    const history = (Array.isArray(rawHistory) ? rawHistory : rawHistory ? [rawHistory] : []).filter(
+      (ts) => now - ts < 300_000
+    );
+    if (history.some((ts) => now - ts < 60_000)) {
+      return json(429, { error: '发得有点快，1 分钟内只能发 1 条。' });
+    }
+    if (history.length >= 3) {
+      return json(429, { error: '5 分钟内最多 3 条评论，歇一会儿再来。' });
     }
 
     postState.comments ||= [];
-    postState.rateLimit ||= {};
     postState.comments.push({
       id: crypto.randomUUID(),
       clientId,
@@ -190,7 +203,7 @@ export default async (request) => {
       status: MODERATION_MODE === 'manual' ? 'pending' : 'approved',
       createdAt: new Date().toISOString(),
     });
-    postState.rateLimit[clientId] = now;
+    postState.rateLimit[clientId] = [...history, now];
 
     await savePostState(slug, postState);
     return json(200, {
@@ -217,6 +230,24 @@ export default async (request) => {
     }
 
     postState.comments = (postState.comments || []).filter((item) => item.id !== commentId && item.parentId !== commentId);
+    await savePostState(slug, postState);
+    return json(200, { comments: toPublicComments(postState.comments, clientId) });
+  }
+
+  if (action === 'approve-comment') {
+    const adminKey = request.headers.get('x-admin-key') || '';
+    if (!process.env.ADMIN_KEY) {
+      return json(503, { error: '未配置 ADMIN_KEY 环境变量，无法执行审核。' });
+    }
+    if (adminKey !== process.env.ADMIN_KEY) {
+      return json(403, { error: '管理密钥不正确。' });
+    }
+    const commentId = sanitizeText(body.commentId, 80);
+    const target = (postState.comments || []).find((item) => item.id === commentId);
+    if (!target) {
+      return json(404, { error: '评论不存在' });
+    }
+    target.status = 'approved';
     await savePostState(slug, postState);
     return json(200, { comments: toPublicComments(postState.comments, clientId) });
   }
