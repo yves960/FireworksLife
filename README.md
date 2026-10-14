@@ -43,6 +43,7 @@ npm run mock           # 仅启动 mock server
 npm run check:content  # 内容护栏：文章 frontmatter 的 pubDate 不得为空
 npm run build          # check:content + 生产构建（输出 frontend/dist）
 npm run preview        # 预览构建产物
+# 注：sitemap-index.xml 由构建生成，astro dev 下 404 属正常；build 后用 preview 访问
 ```
 
 仓库根目录 `scripts/sync-articles.sh` 为文章同步脚本（CI 使用）。

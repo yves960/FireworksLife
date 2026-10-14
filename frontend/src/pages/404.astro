@@ -4,20 +4,24 @@ import { getCollection } from 'astro:content';
 
 const latest = (await getCollection('blog'))
   .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf())
-  .slice(0, 3);
+  .slice(0, 5);
 ---
 
 <Base title="404 · 这条鱼游走了 · 鱼腹" description="页面不存在，或者已经挪了窝。">
   <main class="notfound-shell">
     <p class="notfound-kicker">404 · Signal Lost</p>
     <h1 class="notfound-title">这条鱼游走了</h1>
-    <p class="notfound-desc">页面不存在，或者已经挪了窝。下面几条路都能把你带回有信号的地方。</p>
+    <p class="notfound-desc">页面不存在，或者已经挪了窝。搜点什么，或者从下面的路回去。</p>
+    <form class="notfound-search" action="/" method="get">
+      <input type="search" name="q" aria-label="搜索文章" placeholder="搜点什么再出发…" />
+      <button type="submit">搜索</button>
+    </form>
     <div class="notfound-actions">
       <a class="notfound-home" href="/">返回首页</a>
       <a class="notfound-rss" href="/rss.xml">RSS 订阅</a>
     </div>
     <div class="notfound-latest">
-      <p class="notfound-latest-label">最近的三篇</p>
+      <p class="notfound-latest-label">最近的五篇</p>
       <ul>
         {latest.map((post) => (
           <li>
@@ -53,7 +57,32 @@ const latest = (await getCollection('blog'))
 
   .notfound-desc {
     opacity: 0.68;
-    margin-bottom: 2.2rem;
+    margin-bottom: 2rem;
+  }
+
+  .notfound-search {
+    display: flex;
+    justify-content: center;
+    gap: 0.6rem;
+    margin-bottom: 3rem;
+  }
+
+  .notfound-search input {
+    width: min(22rem, 60vw);
+    padding: 0.55rem 1rem;
+    border-radius: 999px;
+    border: 1px solid rgba(255, 255, 255, 0.24);
+    background: rgba(255, 255, 255, 0.05);
+    color: inherit;
+  }
+
+  .notfound-search button {
+    padding: 0.55rem 1.3rem;
+    border-radius: 999px;
+    border: none;
+    background: rgba(255, 255, 255, 0.12);
+    color: inherit;
+    cursor: pointer;
   }
 
   .notfound-actions {

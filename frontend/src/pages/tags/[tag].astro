@@ -1,0 +1,130 @@
+---
+import Base from '../../layouts/Base.astro';
+import { getCollection } from 'astro:content';
+
+export async function getStaticPaths() {
+  const posts = await getCollection('blog');
+  const tags = new Set<string>();
+  posts.forEach((post) => (post.data.tags || []).forEach((tag) => tags.add(tag)));
+  return [...tags].map((tag) => ({
+    params: { tag },
+    props: {
+      tagged: posts
+        .filter((post) => (post.data.tags || []).includes(tag))
+        .sort((a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf()),
+    },
+  }));
+}
+
+const { tag, tagged } = Astro.props;
+---
+
+<Base title={`#${tag} · 鱼腹`} description={`标签「${tag}」下的 ${tagged.length} 篇文章，按时间倒序。`}>
+  <main class="tagpage-shell">
+    <header class="tagpage-head">
+      <p class="tagpage-kicker">Tag Signal</p>
+      <h1>#{tag}</h1>
+      <p class="tagpage-count">{tagged.length} 篇文章 · 按时间倒序</p>
+      <div class="tagpage-links">
+        <a href="/">← 返回首页</a>
+        <a href="/blog">全部文章</a>
+      </div>
+    </header>
+    <div class="tagpage-list">
+      {tagged.map((post) => (
+        <a class="tagpage-post" href={`/blog/${post.id}/`}>
+          <div class="tagpage-post-head">
+            <span>{post.data.category}</span>
+            <time>{new Date(post.data.pubDate).toLocaleDateString('zh-CN')}</time>
+          </div>
+          <strong>{post.data.title}</strong>
+          <p>{post.data.description}</p>
+        </a>
+      ))}
+    </div>
+  </main>
+</Base>
+
+<style>
+  .tagpage-shell {
+    max-width: 52rem;
+    margin: 0 auto;
+    padding: 4rem 2rem 3rem;
+  }
+
+  .tagpage-head {
+    margin-bottom: 2.4rem;
+  }
+
+  .tagpage-kicker {
+    font-size: 0.76rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    opacity: 0.55;
+    margin-bottom: 0.8rem;
+  }
+
+  .tagpage-head h1 {
+    font-size: 2.2rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .tagpage-count {
+    opacity: 0.6;
+    margin-bottom: 1.2rem;
+  }
+
+  .tagpage-links {
+    display: flex;
+    gap: 1.2rem;
+  }
+
+  .tagpage-links a {
+    color: inherit;
+    opacity: 0.75;
+    text-decoration: none;
+    border-bottom: 1px dashed rgba(255, 255, 255, 0.3);
+  }
+
+  .tagpage-links a:hover {
+    opacity: 1;
+  }
+
+  .tagpage-list {
+    display: grid;
+    gap: 1.1rem;
+  }
+
+  .tagpage-post {
+    display: grid;
+    gap: 0.45rem;
+    padding: 1.2rem 1.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.04);
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .tagpage-post:hover {
+    border-color: rgba(255, 255, 255, 0.3);
+  }
+
+  .tagpage-post-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.76rem;
+    opacity: 0.6;
+  }
+
+  .tagpage-post strong {
+    font-size: 1.05rem;
+    line-height: 1.4;
+  }
+
+  .tagpage-post p {
+    font-size: 0.86rem;
+    opacity: 0.62;
+    line-height: 1.6;
+  }
+</style>

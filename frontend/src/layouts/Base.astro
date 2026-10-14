@@ -93,6 +93,18 @@ const ogImageURL = new URL(image || '/og.jpg', Astro.site);
     </footer>
 
     <style is:global>
+      /* 前庭安全开关：系统偏好减少动效时，全站动画/过渡一次性退化（含 hero-orbit/brand-ring/小鱼） */
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation-duration: 0.01ms !important;
+          animation-iteration-count: 1 !important;
+          transition-duration: 0.01ms !important;
+          scroll-behavior: auto !important;
+        }
+      }
+
       :root {
         --bg-primary: #07111f;
         --bg-secondary: #0d1a2e;

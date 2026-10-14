@@ -167,7 +167,7 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
         <div class="card-footer">
           <div class="post-tags">
             {(post.data.tags || []).slice(0, 3).map((tag) => (
-              <span class="tag">{tag}</span>
+              <span class="tag" role="link" tabindex="0" data-tag-link={`/tags/${tag}/`}>{tag}</span>
             ))}
           </div>
           <div class="post-meta-line">
@@ -434,6 +434,35 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     }
   });
 
+  // 卡片 tag（span 伪链接，避免嵌套 &lt;a&gt;）：委托导航到 /tags/<tag>
+  document.addEventListener('click', (event) => {
+    const tagLink = (event.target as HTMLElement).closest('[data-tag-link]');
+    if (tagLink) {
+      event.preventDefault();
+      event.stopPropagation();
+      window.location.href = tagLink.getAttribute('data-tag-link') || '/';
+    }
+  });
+
+  document.addEventListener('keydown', (event) => {
+    if (event.key !== 'Enter') return;
+    const tagLink = (event.target as HTMLElement).closest('[data-tag-link]');
+    if (tagLink) {
+      window.location.href = tagLink.getAttribute('data-tag-link') || '/';
+    }
+  });
+
+  // 支持 /?q=xxx 入口（404 页搜索框跳转用）
+  const initialQuery = new URLSearchParams(window.location.search).get('q');
+  if (initialQuery && searchInput) {
+    searchInput.value = initialQuery;
+    searchText = normalize(initialQuery);
+    if (searchClear) {
+      searchClear.hidden = !searchText;
+    }
+    filterCards();
+  }
+
   renderFavorites();
 </script>
 
@@ -482,6 +511,15 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
     grid-column: 1 / -1;
     opacity: 0.62;
     font-size: 0.9rem;
+  }
+
+  .post-tags .tag {
+    cursor: pointer;
+  }
+
+  .post-tags .tag:hover,
+  .post-tags .tag:focus-visible {
+    text-decoration: underline;
   }
   .hero {
     display: grid;

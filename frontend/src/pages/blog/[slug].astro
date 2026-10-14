@@ -339,11 +339,25 @@ const olderPost =
         setStatus('');
       })
       .catch(() => {
+        // dev:no-mock 降级：本地态至少把点赞/收藏按钮点亮
+        if (localStorage.getItem(`yufu:local-like:${postSlug}`) === '1' && likeButton && likeCount) {
+          likeCount.textContent = '1';
+          likeButton.classList.add('is-active');
+          likeButton.setAttribute('aria-pressed', 'true');
+        }
+        const localFav = (JSON.parse(localStorage.getItem('yufu:local-favorites') || '[]') as Array<{ slug: string }>).some(
+          (item) => item.slug === postSlug
+        );
+        if (localFav && favoriteButton && favoriteState) {
+          favoriteState.textContent = '已收藏';
+          favoriteButton.classList.add('is-active');
+          favoriteButton.setAttribute('aria-pressed', 'true');
+        }
         if (commentEmpty) {
-          commentEmpty.textContent = '互动服务暂时不可用。';
+          commentEmpty.textContent = '互动服务未启动（dev:no-mock？）：点赞/收藏走本地降级，评论需在线。';
           commentEmpty.style.display = 'block';
         }
-        setStatus('互动服务暂时不可用。', true);
+        setStatus('互动服务未启动：点赞/收藏已切本地降级。', true);
       });
   };
 
@@ -366,7 +380,17 @@ const olderPost =
         applyEngagementState(data);
       })
       .catch(() => {
-        setStatus('点赞失败。', true);
+        // dev:no-mock / 离线降级：点赞记本地，联网后自动回服务端
+        const key = `yufu:local-like:${postSlug}`;
+        const liked = localStorage.getItem(key) === '1';
+        localStorage.setItem(key, liked ? '0' : '1');
+        if (likeButton && likeCount) {
+          const base = Number(likeCount.textContent || '0') || 0;
+          likeCount.textContent = String(liked ? Math.max(0, base - 1) : base + 1);
+          likeButton.classList.toggle('is-active', !liked);
+          likeButton.setAttribute('aria-pressed', String(!liked));
+        }
+        setStatus('离线模式：点赞已记在本地（联网后走服务端）。');
       });
   });
 
@@ -389,7 +413,20 @@ const olderPost =
         applyEngagementState(data);
       })
       .catch(() => {
-        setStatus('收藏失败。', true);
+        // dev:no-mock / 离线降级：收藏记本地
+        const listKey = 'yufu:local-favorites';
+        const list = JSON.parse(localStorage.getItem(listKey) || '[]') as Array<{ slug: string; title: string }>;
+        const exists = list.some((item) => item.slug === postSlug);
+        const next = exists
+          ? list.filter((item) => item.slug !== postSlug)
+          : [...list, { slug: postSlug, title: postTitle }];
+        localStorage.setItem(listKey, JSON.stringify(next));
+        if (favoriteButton && favoriteState) {
+          favoriteState.textContent = exists ? '未收藏' : '已收藏';
+          favoriteButton.classList.toggle('is-active', !exists);
+          favoriteButton.setAttribute('aria-pressed', String(!exists));
+        }
+        setStatus('离线模式：收藏已记在本地（联网后走服务端）。');
       });
   });
 
