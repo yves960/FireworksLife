@@ -5,7 +5,7 @@ pubDate: 2026-04-13
 category: "技术"
 tags:
   - AI
-  - 开发
+  - 思考
 ---
 
 

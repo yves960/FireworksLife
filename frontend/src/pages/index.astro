@@ -4,8 +4,11 @@ import { getCollection } from 'astro:content';
 
 const posts = await getCollection('blog');
 const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-const featuredPost = sortedPosts[0];
-const categories = ['全部', ...new Set(posts.map((p) => p.data.category))];
+const pinnedPost = sortedPosts.find((p) => p.data.pinned);
+const featuredPost = pinnedPost ?? sortedPosts[0];
+const allCategories = [...new Set(posts.map((p) => p.data.category))];
+const CATEGORY_ALL = '全部';
+const categories = [CATEGORY_ALL, ...allCategories];
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
 const totalPosts = sortedPosts.length;
 const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new Date().getFullYear();
@@ -76,13 +79,14 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
         <a href={`/blog/${featuredPost.id}`} class="featured-card" data-spotlight>
           <div class="featured-topline">
             <span>Latest Signal</span>
+            {pinnedPost && <span class="pinned-badge">★ 置顶</span>}
             <span>{new Date(featuredPost.data.pubDate).toLocaleDateString('zh-CN')}</span>
           </div>
           <h2>{featuredPost.data.title}</h2>
           <p>{featuredPost.data.description}</p>
           <div class="featured-meta">
             <span>{featuredPost.data.category}</span>
-            {featuredPost.data.tags?.slice(0, 2).map((tag) => <span>{tag}</span>)}
+            {(featuredPost.data.tags || []).slice(0, 2).map((tag) => <span>{tag}</span>)}
           </div>
         </a>
       )}
@@ -338,7 +342,7 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
         if (!favorites.length) {
           favoritesShell.style.display = 'block';
           favoritesGrid.innerHTML =
-            '<p class="favorites-empty">还没有收藏，去下面挑几篇有意思的吧。</p>';
+            '<p class="favorites-empty">还没有收藏，打开任意文章点「收藏」按钮，就能存到这里。<a href="/blog">去浏览 →</a></p>';
           return;
         }
 
@@ -520,6 +524,17 @@ const latestYear = featuredPost ? featuredPost.data.pubDate.getFullYear() : new 
   .post-tags .tag:hover,
   .post-tags .tag:focus-visible {
     text-decoration: underline;
+  }
+
+  .pinned-badge {
+    align-self: center;
+    padding: 0.15rem 0.7rem;
+    border-radius: 999px;
+    border: 1px solid rgba(242, 173, 114, 0.55);
+    background: rgba(242, 173, 114, 0.14);
+    color: #f2ad72;
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
   }
   .hero {
     display: grid;

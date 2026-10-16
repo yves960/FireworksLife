@@ -4,7 +4,9 @@ import { getCollection } from 'astro:content';
 
 const posts = await getCollection('blog');
 const sortedPosts = posts.sort((a, b) => b.data.pubDate.getTime() - a.data.pubDate.getTime());
-const categories = ['全部', ...new Set(posts.map((p) => p.data.category))];
+const allCategories = [...new Set(posts.map((p) => p.data.category))];
+const CATEGORY_ALL = '全部';
+const categories = [CATEGORY_ALL, ...allCategories];
 const allTags = [...new Set(posts.flatMap((p) => p.data.tags || []))];
 ---
 

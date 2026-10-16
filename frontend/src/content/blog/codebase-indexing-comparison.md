@@ -4,7 +4,7 @@ description: "工程师让 Claude Code 找 bug，它反复 grep 一分钟颗粒�
 pubDate: 2026-04-10
 category: "技术"
 tags:
-  - AI
+  - 工具
   - 开发
 ---
 

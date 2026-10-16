@@ -4,7 +4,7 @@ description: "AI 写代码最大的问题不是能力，而是约束。用户一
 pubDate: 2026-04-10
 category: "技术"
 tags:
-  - AI
+  - 流程
   - 开发
 ---
 
