@@ -1,0 +1,121 @@
+/* 收尾：selection/滚动条/keyframes/媒体查询（保持原顺序） */
+      ::selection {
+        background: rgba(255, 122, 24, 0.85);
+        color: #fff;
+      }
+
+      ::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      ::-webkit-scrollbar-track {
+        background: #08111f;
+      }
+
+      ::-webkit-scrollbar-thumb {
+        background: linear-gradient(180deg, var(--accent), var(--accent-pink));
+        border-radius: 999px;
+      }
+
+      @keyframes drift {
+        0%,
+        100% {
+          transform: translate3d(0, 0, 0) scale(1);
+        }
+        50% {
+          transform: translate3d(2.5rem, 1rem, 0) scale(1.06);
+        }
+      }
+
+      @keyframes pet-bob {
+        0%,
+        100% {
+          transform: translateY(0) rotate(-4deg);
+        }
+        50% {
+          transform: translateY(-0.25rem) rotate(4deg);
+        }
+      }
+
+      @keyframes tail-flick {
+        0%,
+        100% {
+          transform: rotate(14deg) scale(1);
+        }
+        50% {
+          transform: rotate(-18deg) scale(1.04);
+        }
+      }
+
+      @keyframes fin-sway {
+        0%,
+        100% {
+          transform: rotate(-8deg) translateY(0);
+        }
+        50% {
+          transform: rotate(8deg) translateY(-0.05rem);
+        }
+      }
+
+      @keyframes blink {
+        0%,
+        46%,
+        52%,
+        100% {
+          transform: scaleY(1);
+        }
+        49% {
+          transform: scaleY(0.2);
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        *,
+        *::before,
+        *::after {
+          animation: none !important;
+          transition: none !important;
+          scroll-behavior: auto !important;
+        }
+
+        .reveal {
+          opacity: 1;
+          transform: none;
+        }
+      }
+
+      @media (max-width: 720px) {
+        .site-nav {
+          padding-top: 0.75rem;
+        }
+
+        .nav-content {
+          border-radius: 24px;
+          padding: 0.9rem 1rem;
+          flex-direction: column;
+          gap: 0.9rem;
+        }
+
+        .logo-text {
+          font-size: 0.92rem;
+        }
+
+        .nav-links {
+          width: 100%;
+          justify-content: center;
+        }
+
+        .cursor-glow {
+          display: none;
+        }
+
+        /* 移动端：小鱼不消失，吸附右下角继续呼吸/游动（触屏没有鼠标可跟随） */
+        .pet-sprite {
+          transform: translate(calc(100vw - 6rem), calc(100vh - 7rem)) scale(0.75) !important;
+          rotate: 0deg !important;
+        }
+
+        main {
+          padding-top: 2rem;
+        }
+      }

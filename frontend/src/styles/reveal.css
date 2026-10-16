@@ -1,0 +1,15 @@
+/* 入场 reveal 动画 */
+      .reveal {
+        opacity: 0;
+        transform: translateY(34px) scale(0.985);
+        transition:
+          opacity 0.8s ease,
+          transform 0.8s ease;
+        transition-delay: calc(var(--reveal-delay, 0) * 120ms);
+      }
+
+      .reveal.is-visible {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+

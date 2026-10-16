@@ -1,0 +1,16 @@
+/* 光标光晕 */
+      .cursor-glow {
+        position: fixed;
+        left: 0;
+        top: 0;
+        width: 18rem;
+        height: 18rem;
+        border-radius: 999px;
+        background: radial-gradient(circle, rgba(255, 179, 71, 0.14), rgba(94, 234, 212, 0.08) 40%, transparent 70%);
+        transform: translate(-50%, -50%);
+        pointer-events: none;
+        z-index: 1;
+        filter: blur(12px);
+        opacity: 0.9;
+      }
+
