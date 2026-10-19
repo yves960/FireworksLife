@@ -52,7 +52,7 @@ const olderPost =
           <div class="engagement-bar" data-post-slug={postSlug} data-post-title={postTitle}>
             <button type="button" class="engage-button" id="likeButton" aria-pressed="false" aria-label="点赞">
               <span>点赞</span>
-              <strong id="likeCount">0</strong>
+              <strong id="likeCount">—</strong>
             </button>
             <button type="button" class="engage-button" id="favoriteButton" aria-pressed="false" aria-label="收藏">
               <span>收藏</span>
@@ -250,6 +250,14 @@ const olderPost =
     }
   };
 
+  const escapeHtml = (value) =>
+    String(value ?? '')
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#39;');
+
   const renderComments = (items: Array<{ id: string; author: string; content: string; createdAt: string; isMine?: boolean; replies?: Array<{ id: string; author: string; content: string; createdAt: string; isMine?: boolean }> }>) => {
     if (!commentList || !commentEmpty) return;
 
@@ -260,11 +268,11 @@ const olderPost =
         <article class="comment-item">
           <div class="comment-item-head">
             <div class="comment-author-row">
-              <strong>${item.author}</strong>
+              <strong>${escapeHtml(item.author)}</strong>
               <time>${new Date(item.createdAt).toLocaleString('zh-CN')}</time>
             </div>
             <div class="comment-actions">
-              <button type="button" class="comment-reply" data-comment-id="${item.id}" data-comment-author="${item.author}">回复</button>
+              <button type="button" class="comment-reply" data-comment-id="${item.id}" data-comment-author="${escapeHtml(item.author)}">回复</button>
               ${
                 item.isMine
                   ? `<button type="button" class="comment-delete" data-comment-id="${item.id}">删除</button>`
@@ -272,7 +280,7 @@ const olderPost =
               }
             </div>
           </div>
-          <p>${item.content}</p>
+          <p>${escapeHtml(item.content)}</p>
           ${
             item.replies?.length
               ? `<div class="reply-list">
@@ -284,7 +292,7 @@ const olderPost =
                         <article class="reply-item">
                           <div class="comment-item-head">
                             <div class="comment-author-row">
-                              <strong>${reply.author}</strong>
+                              <strong>${escapeHtml(reply.author)}</strong>
                               <time>${new Date(reply.createdAt).toLocaleString('zh-CN')}</time>
                             </div>
                             <div class="comment-actions">
@@ -295,7 +303,7 @@ const olderPost =
                               }
                             </div>
                           </div>
-                          <p>${reply.content}</p>
+                          <p>${escapeHtml(reply.content)}</p>
                         </article>
                       `
                     )

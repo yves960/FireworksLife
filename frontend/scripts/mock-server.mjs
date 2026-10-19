@@ -197,6 +197,15 @@ const server = createServer((req, res) => {
   json(res, 404, { error: 'Not Found' });
 });
 
+server.on('error', (error) => {
+  if (error.code === 'EADDRINUSE') {
+    console.error(`[mock] ERROR: 端口 ${PORT} 已被占用（可能是上一个 mock server 没退干净）。`);
+    console.error(`        排查：lsof -i :${PORT}；或换端口启动：MOCK_PORT=4323 npm run mock`);
+    process.exit(1);
+  }
+  throw error;
+});
+
 server.listen(PORT, () => {
   console.log(`🐟 Mock engagement server → http://localhost:${PORT}`);
   console.log(`   Endpoint: /.netlify/functions/engagement`);

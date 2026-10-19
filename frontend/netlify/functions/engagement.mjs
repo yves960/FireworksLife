@@ -16,6 +16,7 @@ const sanitizeText = (value, maxLength = 120) =>
   String(value || '')
     .trim()
     .replace(/\s+/g, ' ')
+    .replace(/<[^>]*>/g, '')  // 双保险：入库前剔除 HTML 标签（评论不需要任何 HTML；前端另有 escapeHtml 转义）
     .slice(0, maxLength);
 
 const sanitizeSlug = (value) =>
