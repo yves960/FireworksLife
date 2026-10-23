@@ -40,6 +40,7 @@ npm run dev            # 默认开发入口：mock server（:4322）+ astro dev�
 npm run dev:no-mock    # 仅 astro dev（Netlify Functions 本地 404）
 npm run dev:mock       # 等价于 dev
 npm run mock           # 仅启动 mock server
+npm run reset-mock     # 清空 mock 内存数据（评论/点赞/收藏归零，需 mock 运行中；sanitize/评论序列化与生产共享 lib/engagement-shared.mjs）
 npm run check:content  # 内容护栏：文章 frontmatter 的 pubDate 不得为空
 npm run build          # check:content + 生产构建（输出 frontend/dist）
 npm run preview        # 预览构建产物

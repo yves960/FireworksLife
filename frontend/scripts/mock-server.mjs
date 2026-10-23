@@ -15,6 +15,8 @@
 
 import { createServer } from 'node:http';
 
+import { sanitizeSlug, sanitizeText, toPublicComments } from '../lib/engagement-shared.mjs';
+
 const PORT = Number(process.env.MOCK_PORT) || 4322;
 
 // In-memory store
@@ -45,29 +47,18 @@ function getFavorites(clientId) {
   return store.favorites[clientId] || [];
 }
 
-function toPublicComments(comments = []) {
-  return comments
-    .filter((c) => c.status === 'approved')
-    .filter((c) => !c.parentId)
-    .map((c) => ({
-      ...c,
-      replies: comments.filter((r) => r.parentId === c.id && r.status === 'approved'),
-    }));
-}
-
-function sanitizeText(value, maxLength = 120) {
-  return String(value || '').trim().replace(/\s+/g, ' ').slice(0, maxLength);
-}
-
-function sanitizeSlug(value) {
-  return String(value || '').trim().replace(/[^a-zA-Z0-9-_]/g, '').slice(0, 120);
-}
-
 const server = createServer((req, res) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
     json(res, 204, null);
     return;
+  }
+
+  // 开发辅助：POST /__reset 清空内存态（npm run reset-mock，清掉测试残留的评论/点赞/收藏）
+  if (req.url?.split('?')[0] === '/__reset' && req.method === 'POST') {
+    store.posts = {};
+    store.favorites = {};
+    return json(res, 200, { reset: true });
   }
 
   const url = new URL(req.url, `http://localhost:${PORT}`);
@@ -92,7 +83,7 @@ const server = createServer((req, res) => {
         liked: Boolean(clientId && postState.likesBy?.[clientId]),
         likesCount: Object.keys(postState.likesBy || {}).length,
         favorited: favorites.some((f) => f.slug === slug),
-        comments: toPublicComments(postState.comments || []),
+        comments: toPublicComments(postState.comments || [], clientId),
       });
     }
 
@@ -168,7 +159,7 @@ const server = createServer((req, res) => {
           return json(res, 200, {
             moderationMode: 'auto',
             pending: false,
-            comments: toPublicComments(postState.comments),
+            comments: toPublicComments(postState.comments, clientId),
           });
         }
 
@@ -182,7 +173,7 @@ const server = createServer((req, res) => {
           postState.comments = (postState.comments || []).filter(
             (c) => c.id !== commentId && c.parentId !== commentId,
           );
-          return json(res, 200, { comments: toPublicComments(postState.comments) });
+          return json(res, 200, { comments: toPublicComments(postState.comments, clientId) });
         }
 
         return json(res, 400, { error: '不支持的 action' });

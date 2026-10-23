@@ -11,6 +11,7 @@
     "build": "astro build",
     "build:no-check": "astro build",
     "mock": "node scripts/mock-server.mjs",
+    "reset-mock": "node -e \"fetch('http://localhost:'+(process.env.MOCK_PORT||4322)+'/__reset',{method:'POST'}).then(r=>r.json()).then(d=>console.log('[mock] reset:',JSON.stringify(d))).catch(()=>{console.error('[mock] ERROR: mock server 未运行（先 npm run mock）');process.exit(1)})\"",
     "preview": "astro preview"
   },
   "dependencies": {

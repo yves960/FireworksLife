@@ -1,5 +1,7 @@
 import { getStore } from '@netlify/blobs';
 
+import { sanitizeSlug, sanitizeText, toPublicComments } from '../../lib/engagement-shared.mjs';
+
 // 审核模式：默认 manual（公开博客零防线不可接受），环境变量 MODERATION_MODE=auto 可切回
 const MODERATION_MODE = process.env.MODERATION_MODE === 'auto' ? 'auto' : 'manual';
 
@@ -12,43 +14,8 @@ const json = (status, body) =>
     },
   });
 
-const sanitizeText = (value, maxLength = 120) =>
-  String(value || '')
-    .trim()
-    .replace(/\s+/g, ' ')
-    .replace(/<[^>]*>/g, '')  // 双保险：入库前剔除 HTML 标签（评论不需要任何 HTML；前端另有 escapeHtml 转义）
-    .slice(0, maxLength);
-
-const sanitizeSlug = (value) =>
-  String(value || '')
-    .trim()
-    .replace(/[^a-zA-Z0-9-_]/g, '')
-    .slice(0, 120);
-
 const getClientId = (request, url) =>
   request.headers.get('x-client-id') || url.searchParams.get('clientId') || '';
-
-const toPublicComment = (item, clientId) => ({
-  id: item.id,
-  author: item.author,
-  content: item.content,
-  createdAt: item.createdAt,
-  parentId: item.parentId,
-  status: item.status,
-  // 身份比对只在服务端做，clientId 永不出站（修复历史泄漏）
-  isMine: Boolean(clientId && item.clientId === clientId),
-});
-
-const toPublicComments = (comments = [], clientId = '') =>
-  comments
-    .filter((item) => item.status === 'approved')
-    .filter((item) => !item.parentId)
-    .map((item) => ({
-      ...toPublicComment(item, clientId),
-      replies: comments
-        .filter((reply) => reply.parentId === item.id && reply.status === 'approved')
-        .map((reply) => toPublicComment(reply, clientId)),
-    }));
 
 async function getPostState(slug) {
   const store = getStore('yufu-engagement');
