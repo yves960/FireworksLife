@@ -51,6 +51,8 @@ npm run preview        # 预览构建产物
 
 ## 部署
 
+**唯一权威部署路径：Netlify**（根 `netlify.toml`；无 Docker 路径，`.dockerignore` 已移除）。
+
 仓库根目录已经配置了 `netlify.toml`，Netlify 会：
 
 - 构建 `frontend`
