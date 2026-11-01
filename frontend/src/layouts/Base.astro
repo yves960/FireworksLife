@@ -13,7 +13,10 @@ interface Props {
 }
 
 const { title, description = "鱼腹 - 一个更有舞台感的个人博客", image } = Astro.props;
-const canonicalURL = new URL(Astro.url.pathname, Astro.site);
+// P3（蔚 2026-11-01）：重定向页与真实页的尾斜杠归一——统一带尾斜杠，
+// 避免 canonical/og:url 与真实页不一致（搜索引擎视为两个 URL）
+const canonicalPath = Astro.url.pathname.endsWith('/') ? Astro.url.pathname : `${Astro.url.pathname}/`;
+const canonicalURL = new URL(canonicalPath, Astro.site);
 const ogImageURL = new URL(image || '/og.jpg', Astro.site);
 ---
 

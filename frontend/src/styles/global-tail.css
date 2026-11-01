@@ -111,7 +111,7 @@
 
         /* 移动端：小鱼不消失，吸附右下角继续呼吸/游动（触屏没有鼠标可跟随） */
         .pet-sprite {
-          transform: translate(calc(100vw - 6rem), calc(100vh - 7rem)) scale(0.75) !important;
+          transform: translate(calc(100vw - 6rem), calc(100vh - 7rem - env(safe-area-inset-bottom, 0px))) scale(0.75) !important;
           rotate: 0deg !important;
         }
 

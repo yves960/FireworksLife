@@ -47,11 +47,13 @@
           linear-gradient(180deg, #050a13 0%, #091320 36%, #0d1a2e 100%);
         color: var(--text-primary);
         min-height: 100vh;
+        min-height: 100dvh;
         scroll-behavior: smooth;
       }
 
       body {
         min-height: 100vh;
+        min-height: 100dvh;
         position: relative;
         overflow-x: hidden;
       }

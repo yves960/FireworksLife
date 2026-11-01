@@ -5,7 +5,5 @@
 [functions]
   directory = "frontend/netlify/functions"
 
-[[redirects]]
-  from = "/*"
-  to = "/index.html"
-  status = 200
+# 注：不设 /* → /index.html 200 兜底（静态博客不是 SPA）——否则真实 404
+# 会被首页 200 掩盖，dist/404.html 永远到不了用户手里（蔚 11-01 上线收口清理）。

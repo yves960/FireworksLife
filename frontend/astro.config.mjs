@@ -2,8 +2,13 @@ import { defineConfig } from 'astro/config';
 import mdx from '@astrojs/mdx';
 import sitemap from '@astrojs/sitemap';
 
+// 上线域名（蔚 2026-11-01 P0/P1）：默认 fireworkslife.netlify.app（空置可占用），
+// 环境变量 SITE_URL 可覆盖。旧值 yufu.netlify.app / yufu.blog 均被第三方占用，
+// 严禁回填——tests/site-config.test.mjs 有防回归断言。
+const SITE_URL = process.env.SITE_URL || 'https://fireworkslife.netlify.app';
+
 export default defineConfig({
-  site: 'https://yufu.netlify.app',
+  site: SITE_URL,
   redirects: {
     '/blog/2026-04-04-how-to-build-and-optimize-a-skill': '/blog/how-to-build-and-optimize-a-skill',
     '/blog/2026-04-13-ai-developer-anxiety-new-work': '/blog/ai-developer-anxiety-new-work',

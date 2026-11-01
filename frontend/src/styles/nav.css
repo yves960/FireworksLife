@@ -75,6 +75,7 @@
         margin: 0 auto;
         padding: 3rem 1.25rem 5rem;
         min-height: calc(100vh - 10rem);
+        min-height: calc(100dvh - 10rem);
       }
 
       footer {

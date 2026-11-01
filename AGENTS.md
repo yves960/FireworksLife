@@ -26,15 +26,18 @@ npm run verify       # = check:content（pubDate 护栏）+ node --test（契约
 ## 部署（唯一权威路径：Netlify）
 
 - 根目录 `netlify.toml`：`cd frontend && npm install && npm run build`，publish = `frontend/dist`
-- **前置（2026-10-24 状态：未完成）**：owner 的 Netlify 账号建站并接到本 repo（yufu.netlify.app / yufu.blog 均被第三方占用，域名待拍板）
+- **域名（2026-11-01 P0 默认值方案）**：`fireworkslife.netlify.app`（空置可占用）。旧域名 yufu.netlify.app / yufu.blog 均被第三方占用，严禁回填（tests/site-config.test.mjs 防回归）；换域名用环境变量 `SITE_URL` 注入
+- **owner 唯一动作**：终端跑 `netlify login`（30 秒）→ 艾克接管：建站接 repo（netlify.toml 现成）+ 首部署 + 按清单验收。**硬期限 2026-11-07：未拍板则按默认域名执行**
 - 函数：`frontend/netlify/functions/engagement.mjs`；线上 env 需配 `ADMIN_KEY`（manual 审核模式的 approve 通道），可选 `MODERATION_MODE=auto`
 - 无 Docker 部署路径（`.dockerignore` 已移除，避免误导）
 
-## 上线验收 checklist
+## 上线验收 checklist（fireworkslife.netlify.app）
 
 - [ ] `curl 首页` 返回内容含"鱼腹"
-- [ ] `/rss.xml` 200（item 数 ≥ 文章数）；`/sitemap-index.xml` 200
-- [ ] `og:url` / `canonical` 与最终域名一致（`frontend/astro.config.mjs` 的 `site` 字段）
+- [ ] `/rss.xml` 200（item 数 ≥ 文章数），channel.link 指向本域
+- [ ] `/sitemap-index.xml` 200 且域名为本域
+- [ ] 首页 HTML 的 canonical / og:url 为本域且带尾斜杠
+- [ ] 随机不存在路径返 404（不再被 SPA 兜底掩盖）
 - [ ] 评论 API 响应 JSON 无 `clientId` 字段
 - [ ] `/tags/<tag>/` 200（现有 AI/开发/工具/流程/思考 五个标签页）
 
