@@ -18,6 +18,16 @@ test('site 配置不指向已知被占域名（防第三方导流回归）', () 
   }
 });
 
+test('redirects 目标必须带尾斜杠（重定向页 canonical 与真实页一致的前提）', () => {
+  const redirectBlock = config.match(/redirects:\s*\{[\s\S]*?\n\s*\}/);
+  assert.ok(redirectBlock, 'astro.config 应有 redirects 块');
+  const targets = [...redirectBlock[0].matchAll(/'\s*:\s*'([^']+)'/g)].map((m) => m[1]);
+  assert.ok(targets.length >= 2, `应有至少 2 条重定向（含 2026-04-04/13 两条），实得 ${targets.length}`);
+  for (const target of targets) {
+    assert.ok(target.endsWith('/'), `重定向目标必须带尾斜杠: ${target}`);
+  }
+});
+
 test('site 走 SITE_URL 注入或默认 fireworkslife.netlify.app（P0 默认值方案）', () => {
   assert.ok(
     config.includes('process.env.SITE_URL') && config.includes('fireworkslife.netlify.app'),

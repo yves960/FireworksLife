@@ -10,8 +10,11 @@ const SITE_URL = process.env.SITE_URL || 'https://fireworkslife.netlify.app';
 export default defineConfig({
   site: SITE_URL,
   redirects: {
-    '/blog/2026-04-04-how-to-build-and-optimize-a-skill': '/blog/how-to-build-and-optimize-a-skill',
-    '/blog/2026-04-13-ai-developer-anxiety-new-work': '/blog/ai-developer-anxiety-new-work',
+    // 蔚 11-07 P3 重修：目标必须带尾斜杠——重定向页走 Astro 内置模板（不经 Base.astro），
+    // canonical/meta-refresh 逐字取这里的值；不带斜杠则与真实页 canonical 不一致（SEO 视为两 URL）。
+    // postbuild 的 check-redirect-canonical.mjs 在产物层断言两者相等，防再修错对象。
+    '/blog/2026-04-04-how-to-build-and-optimize-a-skill': '/blog/how-to-build-and-optimize-a-skill/',
+    '/blog/2026-04-13-ai-developer-anxiety-new-work': '/blog/ai-developer-anxiety-new-work/',
   },
   integrations: [mdx(), sitemap()],
   // 注意：Astro 顶层没有 server.proxy——代理必须配在 vite.server.proxy 下。
