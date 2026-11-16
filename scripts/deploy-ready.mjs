@@ -40,12 +40,31 @@ if (status.status !== 0) {
 }
 console.log("[deploy:ready] ✓ 已登录，开始建站/关联");
 
-// 2) 建站（已存在则失败）→ 兜底按名关联
-const created = spawnSync("netlify", ["sites:create", "--name", SITE_NAME], { encoding: "utf8", cwd: ROOT });
-if (created.status === 0) {
-  console.log(`[deploy:ready] ✓ 站点 ${SITE_NAME}.netlify.app 已创建`);
-} else {
+// 2) 存在性预判（蔚 2026-11-16 P2-1：原「先 create 失败再 link」试探式流程，owner
+// 已建站未关联时两步失败输出混在一起难读——先 sites:list 判断再走明确分支）
+const listed = spawnSync("netlify", ["sites:list", "--json"], { encoding: "utf8", cwd: ROOT });
+let siteExists = false;
+if (listed.status === 0) {
+  try {
+    const sites = JSON.parse(listed.stdout);
+    siteExists = Array.isArray(sites) && sites.some((s) => s?.name === SITE_NAME);
+  } catch {
+    console.log("[deploy:ready] · sites:list --json 解析失败，回落试探式流程");
+  }
+}
+if (listed.status !== 0) {
+  // list 不可用（网络/版本抖动）——保留旧兜底：先试建站，失败再关联
+  const created = spawnSync("netlify", ["sites:create", "--name", SITE_NAME], { encoding: "utf8", cwd: ROOT });
+  if (created.status === 0) {
+    console.log(`[deploy:ready] ✓ 站点 ${SITE_NAME}.netlify.app 已创建`);
+  } else {
+    run(`关联既有站点 ${SITE_NAME}`, "netlify", ["link", "--name", SITE_NAME]);
+  }
+} else if (siteExists) {
+  console.log(`[deploy:ready] · sites:list 判定 ${SITE_NAME} 已存在 → 走关联分支`);
   run(`关联既有站点 ${SITE_NAME}`, "netlify", ["link", "--name", SITE_NAME]);
+} else {
+  run(`创建站点 ${SITE_NAME}`, "netlify", ["sites:create", "--name", SITE_NAME]);
 }
 
 // 3) 首部署（--prod；netlify.toml 在根目录，publish=frontend/dist）

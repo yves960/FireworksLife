@@ -56,6 +56,12 @@ const server = createServer((req, res) => {
 
   // 开发辅助：POST /__reset 清空内存态（npm run reset-mock，清掉测试残留的评论/点赞/收藏）
   if (req.url?.split('?')[0] === '/__reset' && req.method === 'POST') {
+    // 蔚 2026-11-16 P3-2：防误触——裸 POST 一条 curl 清全库（巡检自坑实录），
+    // 必须带 ?confirm=wipe 才执行，缺参 400 + 提示
+    const resetConfirm = new URL(req.url, `http://localhost:${PORT}`);
+    if (resetConfirm.searchParams.get('confirm') !== 'wipe') {
+      return json(res, 400, { reset: false, hint: '清库是危险操作：POST /__reset?confirm=wipe 才会执行（缺参保护——别再被取证命令的前置 reset 坑了）' });
+    }
     store.posts = {};
     store.favorites = {};
     return json(res, 200, { reset: true });

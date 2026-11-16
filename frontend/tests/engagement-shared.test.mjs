@@ -120,8 +120,8 @@ test('reset-mock 幂等：连续两次 reset 结果一致且数据归零', async
       body: JSON.stringify({ slug: 'reset-test', action: 'comment', author: '甲', content: '会被清掉的' }),
     });
 
-    const first = await api('/__reset', { method: 'POST' }).then((r) => r.json());
-    const second = await api('/__reset', { method: 'POST' }).then((r) => r.json());
+    const first = await api('/__reset?confirm=wipe', { method: 'POST' }).then((r) => r.json());
+    const second = await api('/__reset?confirm=wipe', { method: 'POST' }).then((r) => r.json());
     assert.deepEqual(first, second);
     assert.equal(first.reset, true);
 

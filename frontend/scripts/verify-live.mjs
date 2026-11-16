@@ -10,6 +10,8 @@
  */
 const BASE = (process.env.LIVE_BASE || "https://fireworkslife.netlify.app").replace(/\/$/, "");
 const DOMAIN = new URL(BASE).host;
+// P3-1 修正：host 带端口（localhost:4399）——判本地环境要用 hostname（不带端口）
+const HOSTNAME = new URL(BASE).hostname;
 // 期望域与探活域解耦：本地预演时 LIVE_BASE=localhost 而产物 canonical 是构建域——
 // SITE_EXPECTED 覆盖比较基准（默认同 BASE，线上直跑无需设置）
 const EXPECT = (process.env.SITE_EXPECTED ?? BASE).replace(/\/$/, "");
@@ -50,10 +52,15 @@ try {
     record("rss.xml", items >= 12 && linkOk ? "PASS" : "FAIL", `items=${items}（≥12）${linkOk ? "" : "，channel.link 非本域"}`);
   }
 
-  // 4) sitemap 本域
+  // 4) sitemap 本域（蔚 2026-11-16 P3-1：astro dev 不产 sitemap——本地 404 属环境
+  // 伪影，输出提示而非裸 FAIL，防止把 dev 预演误读成回归）
   const sitemap = await fetchText("/sitemap-index.xml");
+  if (sitemap.resp.status === 404 && (HOSTNAME === "localhost" || HOSTNAME === "127.0.0.1")) {
+    record("sitemap", "SKIP", "404 + 本地环境：astro dev 不产 sitemap——预演请用 `npx astro preview`（真产物缺失仍会 FAIL）");
+  } else {
   const expectHost = new URL(EXPECT).host;
   record("sitemap", sitemap.resp.status === 200 && sitemap.text.includes(expectHost) ? "PASS" : "FAIL", `HTTP ${sitemap.resp.status}${sitemap.text.includes(expectHost) ? "" : "，非本域"}`);
+  }
 
   // 5) canonical + og:url 本域带尾斜杠
   if (home.resp.status === 200) {
